@@ -37,6 +37,7 @@ public function create()
             'productos'        => 'required|array|min:1',
             'descuento_tipo'   => 'nullable|in:monto,porcentaje',
             'descuento_valor'  => 'nullable|numeric|min:0',
+            'adelanto'         => 'nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -60,15 +61,24 @@ public function create()
 
             $total = $subtotal - $descuento;
 
+            $adelanto = (float) ($request->adelanto ?? 0);
+            $adelanto = min($adelanto, $total);
+
+            $estado = $request->estado ?? 'completado';
+            if ($estado === 'completado' && $adelanto > 0 && $adelanto < $total) {
+                $estado = 'pendiente';
+            }
+
             $venta = Venta::create([
                 'cliente_id'      => $request->cliente_id,
                 'user_id'         => auth()->id(),
                 'numero_boleta'   => 'B001-' . str_pad((Venta::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT),
                 'fecha_venta'     => $request->fecha_venta,
                 'total'           => $total,
+                'adelanto'        => $adelanto,
                 'descuento_tipo'  => $descuentoValor > 0 ? $descuentoTipo : null,
                 'descuento_valor' => $descuentoValor > 0 ? $descuentoValor : 0,
-                'estado'          => $request->estado ?? 'completado',
+                'estado'          => $estado,
             ]);
 
             foreach ($request->productos as $item) {
@@ -173,6 +183,16 @@ public function create()
     {
         $venta->update(['estado' => $request->estado]);
         return redirect()->route('ventas.index')->with('success', 'Venta actualizada correctamente.');
+    }
+
+    public function completarPago(Venta $venta)
+    {
+        $venta->update([
+            'adelanto' => $venta->total,
+            'estado'   => 'completado',
+        ]);
+
+        return redirect()->route('ventas.show', $venta)->with('success', 'Pago completado correctamente.');
     }
 
     public function destroy(Venta $venta)

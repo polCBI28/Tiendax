@@ -64,7 +64,48 @@
                     <span class="font-headline-md text-primary font-mono-data">S/ {{ number_format($venta->total, 2) }}</span>
                 </div>
             </div>
+
+            {{-- Info de Pagos --}}
+            @php
+                $deuda = $venta->total - $venta->adelanto;
+            @endphp
+            <div class="pt-4 border-t border-outline-variant space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="font-label-lg text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">payments</span>
+                        Adelanto
+                    </span>
+                    <span class="font-label-lg text-on-surface font-mono-data">S/ {{ number_format($venta->adelanto, 2) }}</span>
+                </div>
+                @if($deuda > 0)
+                <div class="flex justify-between items-center">
+                    <span class="font-label-lg text-error flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">pending</span>
+                        Resta por cobrar
+                    </span>
+                    <span class="font-label-lg text-error font-mono-data font-bold">S/ {{ number_format($deuda, 2) }}</span>
+                </div>
+                @else
+                <div class="flex items-center gap-1 text-green-600 font-label-lg">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    Pagado completamente
+                </div>
+                @endif
+            </div>
         </div>
+
+        @if($deuda > 0 && $venta->estado === 'pendiente')
+        <form action="{{ route('ventas.completar-pago', $venta) }}" method="POST"
+              onsubmit="return confirm('¿Confirmar que el cliente completó el pago de S/ {{ number_format($deuda, 2) }}?')">
+            @csrf
+            @method('PATCH')
+            <button type="submit"
+                    class="flex items-center justify-center gap-2 w-full py-3 bg-primary text-on-primary rounded-xl font-label-lg hover:opacity-90 shadow-sm transition-all">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                Completar Pago (S/ {{ number_format($deuda, 2) }})
+            </button>
+        </form>
+        @endif
 
         <a href="{{ route('ventas.index') }}"
            class="flex items-center justify-center gap-2 w-full py-3 bg-surface-container-high text-on-surface rounded-xl font-label-lg hover:bg-outline-variant/20 transition-all">

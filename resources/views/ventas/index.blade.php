@@ -23,6 +23,8 @@
                     <th class="px-6 py-4 font-label-lg text-on-surface">Cliente</th>
                     <th class="px-6 py-4 font-label-lg text-on-surface">Fecha</th>
                     <th class="px-6 py-4 font-label-lg text-on-surface">Total</th>
+                    <th class="px-6 py-4 font-label-lg text-on-surface">Adelanto</th>
+                    <th class="px-6 py-4 font-label-lg text-on-surface">Deuda</th>
                     <th class="px-6 py-4 font-label-lg text-on-surface">Estado</th>
                     <th class="px-6 py-4 font-label-lg text-on-surface text-right">Acciones</th>
                 </tr>
@@ -34,6 +36,21 @@
                     <td class="px-6 py-4 font-body-sm text-on-surface">{{ $venta->cliente?->nombre ?? 'Sin cliente' }}</td>
                     <td class="px-6 py-4 font-body-sm text-on-surface-variant">{{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</td>
                     <td class="px-6 py-4 font-mono-data font-bold text-on-surface">S/ {{ number_format($venta->total, 2) }}</td>
+                    <td class="px-6 py-4 font-mono-data text-on-surface-variant">
+                        @if($venta->adelanto > 0)
+                            S/ {{ number_format($venta->adelanto, 2) }}
+                        @else
+                            <span class="text-outline">—</span>
+                        @endif
+                    </td>
+                    @php $deudaIdx = $venta->total - $venta->adelanto; @endphp
+                    <td class="px-6 py-4 font-mono-data">
+                        @if($deudaIdx > 0)
+                            <span class="text-error font-bold">S/ {{ number_format($deudaIdx, 2) }}</span>
+                        @else
+                            <span class="text-green-600 text-xs">Pagado</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4">
                         @if($venta->estado === 'completado')
                             <span class="px-2 py-1 bg-green-50 text-green-700 font-label-sm rounded-full">Completado</span>
@@ -63,7 +80,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="py-16 text-center text-on-surface-variant font-label-lg">
+                    <td colspan="8" class="py-16 text-center text-on-surface-variant font-label-lg">
                         No hay ventas registradas aún.
                         <a href="{{ route('ventas.create') }}" class="text-primary hover:underline ml-1">Registrar una</a>
                     </td>

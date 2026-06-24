@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Ventas
     Route::get('/ventas/detalle', [VentaController::class, 'detalle'])->name('ventas.detalle');
+    Route::patch('/ventas/{venta}/completar-pago', [VentaController::class, 'completarPago'])->name('ventas.completar-pago');
     Route::resource('clientes', ClienteController::class);
     Route::resource('ventas', VentaController::class);
     Route::resource('detalle-ventas', DetalleVentaController::class);

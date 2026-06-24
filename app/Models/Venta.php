@@ -11,8 +11,8 @@ class Venta extends Model
 
     protected $fillable = [
         'cliente_id', 'user_id', 'numero_boleta',
-        'fecha_venta', 'total', 'descuento_tipo',
-        'descuento_valor', 'estado'
+        'fecha_venta', 'total', 'adelanto',
+        'descuento_tipo', 'descuento_valor', 'estado'
     ];
 
     public function cliente()

@@ -158,6 +158,33 @@
                 </div>
             </div>
 
+            {{-- Adelanto / Pago parcial --}}
+            <div class="space-y-2 pt-2 border-t border-outline-variant">
+                <div class="flex items-center justify-between">
+                    <label class="font-label-lg text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">payments</span>
+                        Adelanto del cliente
+                    </label>
+                    <button type="button" onclick="setAdelanto50()"
+                            class="px-2 py-0.5 text-xs font-label-sm bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all">
+                        50%
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-label-lg text-on-surface-variant">S/</span>
+                    <input type="number" id="adelanto-input" min="0" step="0.01" placeholder="0.00"
+                           oninput="actualizarAdelanto()"
+                           class="flex-1 bg-white border border-outline-variant rounded-lg py-2 px-3 font-mono-data text-on-surface text-right focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                </div>
+                <div class="flex justify-between items-center font-label-lg" id="fila-deuda" style="display:none">
+                    <span class="text-error flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">pending</span>
+                        Resta por cobrar
+                    </span>
+                    <span class="font-mono-data text-error font-bold" id="deuda-display">S/ 0.00</span>
+                </div>
+            </div>
+
             <div class="flex flex-col space-y-3 pt-1">
                 <div class="flex space-x-3">
                     <button onclick="guardarVenta('borrador')"
@@ -190,6 +217,7 @@
     <input type="hidden" name="estado" id="input-estado">
     <input type="hidden" name="descuento_tipo" id="input-descuento-tipo">
     <input type="hidden" name="descuento_valor" id="input-descuento-valor">
+    <input type="hidden" name="adelanto" id="input-adelanto">
     <div id="input-productos"></div>
 </form>
 
@@ -321,6 +349,31 @@ function actualizarTotales() {
     }
 
     document.getElementById('total').textContent = 'S/ ' + total.toFixed(2);
+    actualizarAdelanto();
+}
+
+function setAdelanto50() {
+    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const descuento = calcularDescuento(subtotal);
+    const total = subtotal - descuento;
+    document.getElementById('adelanto-input').value = (total / 2).toFixed(2);
+    actualizarAdelanto();
+}
+
+function actualizarAdelanto() {
+    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const descuento = calcularDescuento(subtotal);
+    const total = subtotal - descuento;
+    const adelanto = Math.min(parseFloat(document.getElementById('adelanto-input').value) || 0, total);
+    const deuda = total - adelanto;
+
+    const filaDeuda = document.getElementById('fila-deuda');
+    if (adelanto > 0 && deuda > 0) {
+        filaDeuda.style.display = 'flex';
+        document.getElementById('deuda-display').textContent = 'S/ ' + deuda.toFixed(2);
+    } else {
+        filaDeuda.style.display = 'none';
+    }
 }
 
 function guardarVenta(estado) {
@@ -335,6 +388,7 @@ function guardarVenta(estado) {
     document.getElementById('input-estado').value   = estado;
     document.getElementById('input-descuento-tipo').value  = (descuentoActivo && descuentoVal > 0) ? descuentoTipo : '';
     document.getElementById('input-descuento-valor').value = (descuentoActivo && descuentoVal > 0) ? descuentoVal : 0;
+    document.getElementById('input-adelanto').value = parseFloat(document.getElementById('adelanto-input').value) || 0;
 
     const container = document.getElementById('input-productos');
     container.innerHTML = '';

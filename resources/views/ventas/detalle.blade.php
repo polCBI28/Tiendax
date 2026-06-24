@@ -48,7 +48,7 @@
     <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm">
         <div class="flex items-center gap-2 mb-2">
             <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
-                <span class="material-symbols-outlined text-secondary text-[18px]">discount</span>
+                <span class="material-symbols-outlined text-secondary text-[18px]">percent</span>
             </div>
             <span class="font-label-sm text-on-surface-variant">Descuentos</span>
         </div>
@@ -163,6 +163,8 @@
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Subtotal</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Descuento</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Total</th>
+                    <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Adelanto</th>
+                    <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Deuda</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-center">Estado</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap">Vendedor</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-center">Acciones</th>
@@ -228,7 +230,7 @@
                     <td class="px-4 py-3 text-right whitespace-nowrap">
                         @if($tieneDescuento)
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-sm bg-secondary/10 text-secondary">
-                            <span class="material-symbols-outlined text-[14px]">discount</span>
+                            <span class="material-symbols-outlined text-[14px]">percent</span>
                             @if($venta->descuento_tipo === 'porcentaje')
                                 {{ number_format($venta->descuento_valor, 0) }}%
                             @else
@@ -242,6 +244,26 @@
                     {{-- Total --}}
                     <td class="px-4 py-3 font-label-lg text-on-surface text-right whitespace-nowrap font-bold">
                         S/ {{ number_format($venta->total, 2) }}
+                    </td>
+                    {{-- Adelanto --}}
+                    <td class="px-4 py-3 font-body-sm text-right whitespace-nowrap">
+                        @if($venta->adelanto > 0)
+                            <span class="text-on-surface font-mono-data">S/ {{ number_format($venta->adelanto, 2) }}</span>
+                        @else
+                            <span class="text-outline font-label-sm">—</span>
+                        @endif
+                    </td>
+                    {{-- Deuda --}}
+                    @php $deudaVenta = $venta->total - $venta->adelanto; @endphp
+                    <td class="px-4 py-3 font-body-sm text-right whitespace-nowrap">
+                        @if($deudaVenta > 0)
+                            <span class="text-error font-mono-data font-bold">S/ {{ number_format($deudaVenta, 2) }}</span>
+                        @else
+                            <span class="text-green-600 font-label-sm flex items-center justify-end gap-0.5">
+                                <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                Pagado
+                            </span>
+                        @endif
                     </td>
                     {{-- Estado --}}
                     <td class="px-4 py-3 text-center whitespace-nowrap">
@@ -273,7 +295,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="11" class="px-4 py-16 text-center">
+                    <td colspan="13" class="px-4 py-16 text-center">
                         <div class="flex flex-col items-center gap-3 text-outline">
                             <span class="material-symbols-outlined text-[48px]">receipt_long</span>
                             <p class="font-body-md">No se encontraron ventas con los filtros aplicados.</p>
