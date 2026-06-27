@@ -143,12 +143,7 @@
             <span class="material-symbols-outlined">trending_up</span>
             <span class="font-label-lg text-label-lg">Movimientos</span>
         </a>
-        <a href="{{ route('clientes.index') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('clientes.*') ? 'border-l-4 border-primary bg-primary-container/10 text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-high' }} transition-colors duration-200">
-            <span class="material-symbols-outlined">people</span>
-            <span class="font-label-lg text-label-lg">Clientes</span>
-        </a>
-        <a href="{{ route('ventas.index') }}"
+<a href="{{ route('ventas.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('ventas.index') || request()->routeIs('ventas.show') || request()->routeIs('ventas.create') ? 'border-l-4 border-primary bg-primary-container/10 text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-high' }} transition-colors duration-200">
             <span class="material-symbols-outlined">point_of_sale</span>
             <span class="font-label-lg text-label-lg">Ventas</span>
