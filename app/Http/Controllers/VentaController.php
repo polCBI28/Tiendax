@@ -37,6 +37,8 @@ public function create()
             'productos'        => 'required|array|min:1',
             'descuento_tipo'   => 'nullable|in:monto,porcentaje',
             'descuento_valor'  => 'nullable|numeric|min:0',
+            'recargo_tipo'     => 'nullable|in:monto,porcentaje',
+            'recargo_valor'    => 'nullable|numeric|min:0',
             'adelanto'         => 'nullable|numeric|min:0',
         ]);
 
@@ -59,7 +61,20 @@ public function create()
                 }
             }
 
-            $total = $subtotal - $descuento;
+            $recargoTipo  = $request->recargo_tipo;
+            $recargoValor = (float) ($request->recargo_valor ?? 0);
+            $recargo = 0;
+
+            if ($recargoValor > 0 && $recargoTipo) {
+                $baseRecargo = $subtotal - $descuento;
+                if ($recargoTipo === 'porcentaje') {
+                    $recargo = round($baseRecargo * min($recargoValor, 100) / 100, 2);
+                } else {
+                    $recargo = $recargoValor;
+                }
+            }
+
+            $total = $subtotal - $descuento + $recargo;
 
             $adelanto = (float) ($request->adelanto ?? 0);
             $adelanto = min($adelanto, $total);
@@ -78,16 +93,19 @@ public function create()
                 'adelanto'        => $adelanto,
                 'descuento_tipo'  => $descuentoValor > 0 ? $descuentoTipo : null,
                 'descuento_valor' => $descuentoValor > 0 ? $descuentoValor : 0,
+                'recargo_tipo'    => $recargoValor > 0 ? $recargoTipo : null,
+                'recargo_valor'   => $recargoValor > 0 ? $recargoValor : 0,
                 'estado'          => $estado,
             ]);
 
             foreach ($request->productos as $item) {
                 DetalleVenta::create([
-                    'venta_id'       => $venta->id,
-                    'producto_id'    => $item['producto_id'],
-                    'cantidad'       => $item['cantidad'],
-                    'precio_unitario'=> $item['precio_unitario'],
-                    'subtotal'       => $item['precio_unitario'] * $item['cantidad'],
+                    'venta_id'        => $venta->id,
+                    'producto_id'     => $item['producto_id'],
+                    'cantidad'        => $item['cantidad'],
+                    'precio_unitario' => $item['precio_unitario'],
+                    'adicional'       => $item['adicional'] ?? 0,
+                    'subtotal'        => $item['precio_unitario'] * $item['cantidad'],
                 ]);
 
                 // Descontar stock

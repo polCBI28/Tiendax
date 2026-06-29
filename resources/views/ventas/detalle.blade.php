@@ -162,6 +162,7 @@
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-center">Uds.</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Subtotal</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Descuento</th>
+                    <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Recargo</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Total</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Adelanto</th>
                     <th class="px-4 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Deuda</th>
@@ -241,6 +242,21 @@
                             <span class="text-outline font-label-sm">—</span>
                         @endif
                     </td>
+                    {{-- Recargo --}}
+                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                        @if($venta->recargo_valor > 0)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-sm bg-tertiary/10 text-tertiary">
+                            <span class="material-symbols-outlined text-[14px]">add_circle</span>
+                            @if($venta->recargo_tipo === 'porcentaje')
+                                {{ number_format($venta->recargo_valor, 0) }}%
+                            @else
+                                S/ {{ number_format($venta->recargo_valor, 2) }}
+                            @endif
+                        </span>
+                        @else
+                            <span class="text-outline font-label-sm">—</span>
+                        @endif
+                    </td>
                     {{-- Total --}}
                     <td class="px-4 py-3 font-label-lg text-on-surface text-right whitespace-nowrap font-bold">
                         S/ {{ number_format($venta->total, 2) }}
@@ -254,7 +270,7 @@
                         @endif
                     </td>
                     {{-- Deuda --}}
-                    @php $deudaVenta = $venta->total - $venta->adelanto; @endphp
+                    @php $deudaVenta = $venta->estado === 'completado' ? 0 : max(0, $venta->total - $venta->adelanto); @endphp
                     <td class="px-4 py-3 font-body-sm text-right whitespace-nowrap">
                         @if($deudaVenta > 0)
                             <span class="text-error font-mono-data font-bold">S/ {{ number_format($deudaVenta, 2) }}</span>
@@ -295,7 +311,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="13" class="px-4 py-16 text-center">
+                    <td colspan="14" class="px-4 py-16 text-center">
                         <div class="flex flex-col items-center gap-3 text-outline">
                             <span class="material-symbols-outlined text-[48px]">receipt_long</span>
                             <p class="font-body-md">No se encontraron ventas con los filtros aplicados.</p>
@@ -321,11 +337,27 @@
                 Total página: <span class="text-primary font-bold">S/ {{ number_format($ventas->sum('total'), 2) }}</span>
             </span>
             @php
-                $descuentosPagina = $ventas->sum(fn($v) => $v->detalles->sum('subtotal') - $v->total);
+                $descuentosPagina = $ventas->sum(fn($v) => $v->descuento_valor > 0
+                    ? ($v->descuento_tipo === 'porcentaje'
+                        ? round($v->detalles->sum('subtotal') * $v->descuento_valor / 100, 2)
+                        : $v->descuento_valor)
+                    : 0);
+                $recargosPagina = $ventas->sum(fn($v) => $v->recargo_valor > 0
+                    ? ($v->recargo_tipo === 'porcentaje'
+                        ? round(($v->detalles->sum('subtotal') - ($v->descuento_tipo === 'porcentaje'
+                            ? round($v->detalles->sum('subtotal') * $v->descuento_valor / 100, 2)
+                            : $v->descuento_valor)) * $v->recargo_valor / 100, 2)
+                        : $v->recargo_valor)
+                    : 0);
             @endphp
             @if($descuentosPagina > 0)
             <span>
-                Descuentos: <span class="text-secondary font-bold">S/ {{ number_format($descuentosPagina, 2) }}</span>
+                Descuentos: <span class="text-secondary font-bold">- S/ {{ number_format($descuentosPagina, 2) }}</span>
+            </span>
+            @endif
+            @if($recargosPagina > 0)
+            <span>
+                Recargos: <span class="text-tertiary font-bold">+ S/ {{ number_format($recargosPagina, 2) }}</span>
             </span>
             @endif
         </div>

@@ -43,7 +43,7 @@
                             <span class="text-outline">—</span>
                         @endif
                     </td>
-                    @php $deudaIdx = $venta->total - $venta->adelanto; @endphp
+                    @php $deudaIdx = $venta->estado === 'completado' ? 0 : max(0, $venta->total - $venta->adelanto); @endphp
                     <td class="px-6 py-4 font-mono-data">
                         @if($deudaIdx > 0)
                             <span class="text-error font-bold">S/ {{ number_format($deudaIdx, 2) }}</span>

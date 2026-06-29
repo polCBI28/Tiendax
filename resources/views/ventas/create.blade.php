@@ -137,6 +137,35 @@
                 </div>
             </div>
 
+            {{-- Recargo --}}
+            <div class="space-y-2">
+                <button onclick="toggleRecargo()" type="button"
+                        class="flex items-center gap-2 font-label-lg text-tertiary hover:text-tertiary/80 transition-colors">
+                    <span id="label-recargo">+ Agregar recargo</span>
+                </button>
+                <div id="panel-recargo" class="hidden">
+                    <div class="flex items-center gap-2 p-3 bg-tertiary/5 rounded-xl border border-tertiary/15">
+                        <div class="flex bg-white rounded-lg border border-outline-variant overflow-hidden shrink-0">
+                            <button type="button" onclick="setTipoRecargo('monto')" id="btn-recargo-monto"
+                                    class="px-3 py-1.5 font-label-sm transition-all bg-tertiary text-on-tertiary">
+                                S/
+                            </button>
+                            <button type="button" onclick="setTipoRecargo('porcentaje')" id="btn-recargo-porcentaje"
+                                    class="px-3 py-1.5 font-label-sm transition-all text-on-surface-variant hover:bg-surface-container-low">
+                                %
+                            </button>
+                        </div>
+                        <input type="number" id="recargo-input" min="0" step="0.01" placeholder="0.00"
+                               oninput="actualizarTotales()"
+                               class="flex-1 bg-white border border-outline-variant rounded-lg py-1.5 px-3 font-mono-data text-on-surface text-right focus:border-tertiary focus:ring-2 focus:ring-tertiary/20 outline-none transition-all">
+                        <button onclick="quitarRecargo()" type="button"
+                                class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-all shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {{-- Totales --}}
             <div class="space-y-2">
                 <div class="flex justify-between items-center font-label-lg text-on-surface-variant" id="fila-subtotal" style="display:none">
@@ -146,6 +175,10 @@
                 <div class="flex justify-between items-center font-label-lg text-secondary" id="fila-descuento" style="display:none">
                     <span id="descuento-label">Descuento</span>
                     <span class="font-mono-data" id="descuento-display">- S/ 0.00</span>
+                </div>
+                <div class="flex justify-between items-center font-label-lg text-tertiary" id="fila-recargo" style="display:none">
+                    <span id="recargo-label">Recargo</span>
+                    <span class="font-mono-data" id="recargo-display">+ S/ 0.00</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="font-headline-md text-on-surface">Total</span>
@@ -212,6 +245,8 @@
     <input type="hidden" name="estado" id="input-estado">
     <input type="hidden" name="descuento_tipo" id="input-descuento-tipo">
     <input type="hidden" name="descuento_valor" id="input-descuento-valor">
+    <input type="hidden" name="recargo_tipo" id="input-recargo-tipo">
+    <input type="hidden" name="recargo_valor" id="input-recargo-valor">
     <input type="hidden" name="adelanto" id="input-adelanto">
     <div id="input-productos"></div>
 </form>
@@ -220,6 +255,8 @@
 let carrito = [];
 let descuentoTipo = 'monto';
 let descuentoActivo = false;
+let recargoTipo = 'monto';
+let recargoActivo = false;
 
 function agregarAlCarrito(el) {
     const id     = el.dataset.id;
@@ -354,6 +391,46 @@ function quitarDescuento() {
     actualizarTotales();
 }
 
+function toggleRecargo() {
+    recargoActivo = !recargoActivo;
+    document.getElementById('panel-recargo').classList.toggle('hidden', !recargoActivo);
+    document.getElementById('label-recargo').textContent = recargoActivo ? '- Ocultar recargo' : '+ Agregar recargo';
+    if (recargoActivo) document.getElementById('recargo-input').focus();
+    actualizarTotales();
+}
+
+function quitarRecargo() {
+    recargoActivo = false;
+    document.getElementById('recargo-input').value = '';
+    document.getElementById('panel-recargo').classList.add('hidden');
+    document.getElementById('label-recargo').textContent = '+ Agregar recargo';
+    actualizarTotales();
+}
+
+function setTipoRecargo(tipo) {
+    recargoTipo = tipo;
+    const btnMonto = document.getElementById('btn-recargo-monto');
+    const btnPorcentaje = document.getElementById('btn-recargo-porcentaje');
+    if (tipo === 'monto') {
+        btnMonto.className = 'px-3 py-1.5 font-label-sm transition-all bg-tertiary text-on-tertiary';
+        btnPorcentaje.className = 'px-3 py-1.5 font-label-sm transition-all text-on-surface-variant hover:bg-surface-container-low';
+    } else {
+        btnPorcentaje.className = 'px-3 py-1.5 font-label-sm transition-all bg-tertiary text-on-tertiary';
+        btnMonto.className = 'px-3 py-1.5 font-label-sm transition-all text-on-surface-variant hover:bg-surface-container-low';
+    }
+    actualizarTotales();
+}
+
+function calcularRecargo(base) {
+    if (!recargoActivo) return 0;
+    const val = parseFloat(document.getElementById('recargo-input').value) || 0;
+    if (val <= 0) return 0;
+    if (recargoTipo === 'porcentaje') {
+        return Math.round(base * Math.min(val, 100) / 100 * 100) / 100;
+    }
+    return val;
+}
+
 function setTipoDescuento(tipo) {
     descuentoTipo = tipo;
     const btnMonto = document.getElementById('btn-tipo-monto');
@@ -382,37 +459,52 @@ function calcularDescuento(subtotal) {
 function actualizarTotales() {
     const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
-    const total = subtotal - descuento;
+    const base = subtotal - descuento;
+    const recargo = calcularRecargo(base);
+    const total = base + recargo;
     const hayDescuento = descuento > 0;
+    const hayRecargo = recargo > 0;
+    const hayModificadores = hayDescuento || hayRecargo;
 
-    document.getElementById('fila-subtotal').style.display = hayDescuento ? 'flex' : 'none';
+    document.getElementById('fila-subtotal').style.display = hayModificadores ? 'flex' : 'none';
     document.getElementById('fila-descuento').style.display = hayDescuento ? 'flex' : 'none';
+    document.getElementById('fila-recargo').style.display = hayRecargo ? 'flex' : 'none';
     document.getElementById('subtotal-display').textContent = 'S/ ' + subtotal.toFixed(2);
     document.getElementById('descuento-display').textContent = '- S/ ' + descuento.toFixed(2);
+    document.getElementById('recargo-display').textContent = '+ S/ ' + recargo.toFixed(2);
 
-    const val = parseFloat(document.getElementById('descuento-input').value) || 0;
-    if (descuentoTipo === 'porcentaje' && val > 0) {
-        document.getElementById('descuento-label').textContent = 'Descuento (' + Math.min(val, 100) + '%)';
+    const valDesc = parseFloat(document.getElementById('descuento-input').value) || 0;
+    if (descuentoTipo === 'porcentaje' && valDesc > 0) {
+        document.getElementById('descuento-label').textContent = 'Descuento (' + Math.min(valDesc, 100) + '%)';
     } else {
         document.getElementById('descuento-label').textContent = 'Descuento';
+    }
+
+    const valRec = parseFloat(document.getElementById('recargo-input').value) || 0;
+    if (recargoTipo === 'porcentaje' && valRec > 0) {
+        document.getElementById('recargo-label').textContent = 'Recargo (' + Math.min(valRec, 100) + '%)';
+    } else {
+        document.getElementById('recargo-label').textContent = 'Recargo';
     }
 
     document.getElementById('total').textContent = 'S/ ' + total.toFixed(2);
     actualizarAdelanto();
 }
 
-function setAdelanto50() {
+function calcularTotal() {
     const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
-    const total = subtotal - descuento;
-    document.getElementById('adelanto-input').value = (total / 2).toFixed(2);
+    const recargo = calcularRecargo(subtotal - descuento);
+    return subtotal - descuento + recargo;
+}
+
+function setAdelanto50() {
+    document.getElementById('adelanto-input').value = (calcularTotal() / 2).toFixed(2);
     actualizarAdelanto();
 }
 
 function actualizarAdelanto() {
-    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
-    const descuento = calcularDescuento(subtotal);
-    const total = subtotal - descuento;
+    const total = calcularTotal();
     const adelanto = Math.min(parseFloat(document.getElementById('adelanto-input').value) || 0, total);
     const deuda = total - adelanto;
 
@@ -428,15 +520,16 @@ function actualizarAdelanto() {
 function guardarVenta(estado) {
     if (carrito.length === 0) { alert('Agrega al menos un producto al carrito.'); return; }
 
-    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
-    const descuento = calcularDescuento(subtotal);
     const descuentoVal = parseFloat(document.getElementById('descuento-input').value) || 0;
+    const recargoVal   = parseFloat(document.getElementById('recargo-input').value) || 0;
 
     document.getElementById('input-fecha').value        = document.getElementById('fecha_venta').value;
     document.getElementById('input-descripcion').value  = document.getElementById('descripcion').value;
     document.getElementById('input-estado').value       = estado;
     document.getElementById('input-descuento-tipo').value  = (descuentoActivo && descuentoVal > 0) ? descuentoTipo : '';
     document.getElementById('input-descuento-valor').value = (descuentoActivo && descuentoVal > 0) ? descuentoVal : 0;
+    document.getElementById('input-recargo-tipo').value  = (recargoActivo && recargoVal > 0) ? recargoTipo : '';
+    document.getElementById('input-recargo-valor').value = (recargoActivo && recargoVal > 0) ? recargoVal : 0;
     document.getElementById('input-adelanto').value = parseFloat(document.getElementById('adelanto-input').value) || 0;
 
     const container = document.getElementById('input-productos');
@@ -446,6 +539,7 @@ function guardarVenta(estado) {
             <input type="hidden" name="productos[${i}][producto_id]"    value="${item.id}">
             <input type="hidden" name="productos[${i}][cantidad]"        value="${item.cantidad}">
             <input type="hidden" name="productos[${i}][precio_unitario]" value="${precioFinal(item).toFixed(2)}">
+            <input type="hidden" name="productos[${i}][adicional]"       value="${item.adicional.toFixed(2)}">
         `;
     });
 

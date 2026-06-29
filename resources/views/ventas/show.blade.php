@@ -43,14 +43,26 @@
                 <p class="font-label-lg text-on-surface">{{ $venta->user?->name ?? '—' }}</p>
             </div>
             <div class="pt-4 border-t border-outline-variant space-y-2">
-                @if($venta->descuento_valor > 0)
                 @php
-                    $subtotalVenta = $venta->detalles->sum('subtotal');
+                    $subtotalVenta  = $venta->detalles->sum('subtotal');
+                    $montoDescuento = $venta->descuento_valor > 0
+                        ? ($venta->descuento_tipo === 'porcentaje'
+                            ? round($subtotalVenta * $venta->descuento_valor / 100, 2)
+                            : $venta->descuento_valor)
+                        : 0;
+                    $montoRecargo   = $venta->recargo_valor > 0
+                        ? ($venta->recargo_tipo === 'porcentaje'
+                            ? round(($subtotalVenta - $montoDescuento) * $venta->recargo_valor / 100, 2)
+                            : $venta->recargo_valor)
+                        : 0;
                 @endphp
+                @if($montoDescuento > 0 || $montoRecargo > 0)
                 <div class="flex justify-between items-center">
                     <span class="font-label-lg text-on-surface-variant">Subtotal</span>
                     <span class="font-label-lg text-on-surface-variant font-mono-data">S/ {{ number_format($subtotalVenta, 2) }}</span>
                 </div>
+                @endif
+                @if($montoDescuento > 0)
                 <div class="flex justify-between items-center">
                     <span class="font-label-lg text-secondary flex items-center gap-1">
                         <span class="material-symbols-outlined text-[16px]">discount</span>
@@ -59,9 +71,19 @@
                             ({{ number_format($venta->descuento_valor, 0) }}%)
                         @endif
                     </span>
-                    <span class="font-label-lg text-secondary font-mono-data">
-                        - S/ {{ number_format($subtotalVenta - $venta->total, 2) }}
+                    <span class="font-label-lg text-secondary font-mono-data">- S/ {{ number_format($montoDescuento, 2) }}</span>
+                </div>
+                @endif
+                @if($montoRecargo > 0)
+                <div class="flex justify-between items-center">
+                    <span class="font-label-lg text-tertiary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                        Recargo
+                        @if($venta->recargo_tipo === 'porcentaje')
+                            ({{ number_format($venta->recargo_valor, 0) }}%)
+                        @endif
                     </span>
+                    <span class="font-label-lg text-tertiary font-mono-data">+ S/ {{ number_format($montoRecargo, 2) }}</span>
                 </div>
                 @endif
                 <div class="flex justify-between items-center">
@@ -72,7 +94,7 @@
 
             {{-- Info de Pagos --}}
             @php
-                $deuda = $venta->total - $venta->adelanto;
+                $deuda = $venta->estado === 'completado' ? 0 : max(0, $venta->total - $venta->adelanto);
             @endphp
             <div class="pt-4 border-t border-outline-variant space-y-2">
                 <div class="flex justify-between items-center">
@@ -137,7 +159,16 @@
                 <tbody class="divide-y divide-outline-variant">
                     @foreach($venta->detalles as $detalle)
                     <tr class="table-row-hover transition-colors">
-                        <td class="px-6 py-4 font-body-sm text-on-surface">{{ $detalle->producto?->nombre ?? '—' }}</td>
+                        <td class="px-6 py-4">
+                            <p class="font-body-sm text-on-surface">{{ $detalle->producto?->nombre ?? '—' }}</p>
+                            @if($detalle->adicional > 0)
+                            @php $precioBase = $detalle->precio_unitario - $detalle->adicional; @endphp
+                            <p class="font-label-sm text-on-surface-variant mt-0.5">
+                                Base S/ {{ number_format($precioBase, 2) }}
+                                <span class="text-secondary font-medium ml-1">+ S/ {{ number_format($detalle->adicional, 2) }} adicional</span>
+                            </p>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 font-mono-data text-on-surface text-center">{{ $detalle->cantidad }}</td>
                         <td class="px-6 py-4 font-mono-data text-on-surface text-right">S/ {{ number_format($detalle->precio_unitario, 2) }}</td>
                         <td class="px-6 py-4 font-mono-data font-bold text-on-surface text-right">S/ {{ number_format($detalle->subtotal, 2) }}</td>
