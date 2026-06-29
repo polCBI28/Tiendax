@@ -20,20 +20,20 @@ class VentaController extends Controller
 
 public function create()
 {
-    $clientes   = Cliente::all();
     $categorias = \App\Models\Categoria::where('activo', true)->get();
     $productos  = Producto::where('activo', true)
                     ->where('stock', '>', 0)
                     ->with('categoria')
                     ->get();
 
-    return view('ventas.create', compact('clientes', 'categorias', 'productos'));
+    return view('ventas.create', compact('categorias', 'productos'));
 }
 
     public function store(Request $request)
     {
         $request->validate([
             'fecha_venta'      => 'required|date',
+            'descripcion'      => 'nullable|string|max:500',
             'productos'        => 'required|array|min:1',
             'descuento_tipo'   => 'nullable|in:monto,porcentaje',
             'descuento_valor'  => 'nullable|numeric|min:0',
@@ -70,10 +70,10 @@ public function create()
             }
 
             $venta = Venta::create([
-                'cliente_id'      => $request->cliente_id,
                 'user_id'         => auth()->id(),
                 'numero_boleta'   => 'B001-' . str_pad((Venta::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT),
                 'fecha_venta'     => $request->fecha_venta,
+                'descripcion'     => $request->descripcion,
                 'total'           => $total,
                 'adelanto'        => $adelanto,
                 'descuento_tipo'  => $descuentoValor > 0 ? $descuentoTipo : null,

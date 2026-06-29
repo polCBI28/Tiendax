@@ -12,28 +12,40 @@ class ProductoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Producto::with('categoria', 'subcategoria');
+        $query = Producto::with('categoria', 'subcategoria')
+            ->withCount('detalleVentas as num_ventas')
+            ->withSum('detalleVentas as unidades_vendidas', 'cantidad')
+            ->withSum('detalleVentas as ingresos_generados', 'subtotal');
 
-        if ($request->categoria_id) {
+        if ($request->filled('categoria_id')) {
             $query->where('categoria_id', $request->categoria_id);
         }
-        if ($request->estado) {
+        if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(fn($sq) => $sq->where('nombre', 'like', "%$q%")->orWhere('sku', 'like', "%$q%"));
+        }
 
-        $productos      = $query->paginate(10);
-        $categorias     = Categoria::all();
+        $ordenar  = $request->get('ordenar', 'nombre');
+        $dir      = $request->get('dir', 'asc');
+        $columnas = ['nombre', 'sku', 'precio_venta', 'precio_costo', 'stock', 'unidades_vendidas', 'ingresos_generados'];
+        if (in_array($ordenar, $columnas)) {
+            $query->orderBy($ordenar, $dir === 'desc' ? 'desc' : 'asc');
+        }
+
+        $productos      = $query->paginate(20)->withQueryString();
+        $categorias     = Categoria::orderBy('nombre')->get();
         $totalProductos = Producto::count();
         $bajoStock      = Producto::where('estado', 'bajo_stock')->count();
         $agotados       = Producto::where('estado', 'agotado')->count();
         $valorTotal     = Producto::sum(DB::raw('precio_venta * stock'));
         $nuevosEsteMes  = Producto::whereMonth('created_at', now()->month)->count();
-        $alertas        = Producto::where('stock', '<=', DB::raw('stock_minimo'))
-                            ->where('stock', '>', 0)->limit(5)->get();
 
         return view('productos.index', compact(
             'productos', 'categorias', 'totalProductos',
-            'bajoStock', 'agotados', 'valorTotal', 'nuevosEsteMes', 'alertas'
+            'bajoStock', 'agotados', 'valorTotal', 'nuevosEsteMes'
         ));
     }
 

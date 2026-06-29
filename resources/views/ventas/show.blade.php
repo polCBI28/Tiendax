@@ -25,10 +25,15 @@
     {{-- Info de la venta --}}
     <div class="space-y-6">
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-6 space-y-4">
-            <div>
-                <p class="font-label-sm text-on-surface-variant mb-1">Cliente</p>
-                <p class="font-label-lg text-on-surface">{{ $venta->cliente?->nombre ?? 'Sin cliente' }}</p>
+            @if($venta->descripcion)
+            <div class="p-3 bg-primary/5 rounded-xl border border-primary/15 flex gap-3">
+                <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">description</span>
+                <div>
+                    <p class="font-label-sm text-primary mb-0.5">Descripción del pedido</p>
+                    <p class="font-body-sm text-on-surface">{{ $venta->descripcion }}</p>
+                </div>
             </div>
+            @endif
             <div>
                 <p class="font-label-sm text-on-surface-variant mb-1">Fecha</p>
                 <p class="font-label-lg text-on-surface">{{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</p>

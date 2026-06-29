@@ -11,7 +11,7 @@
                 <span class="material-symbols-outlined">description</span>
                 Datos del Comprobante
             </h3>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="space-y-1">
                     <label class="font-label-lg text-on-surface-variant">N° Recibo / Boleta</label>
                     <input type="text" id="numero_boleta" readonly
@@ -23,16 +23,11 @@
                     <input type="date" id="fecha_venta" value="{{ date('Y-m-d') }}"
                            class="w-full bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-2 px-3 font-body-sm transition-all outline-none">
                 </div>
-                <div class="space-y-1">
-                    <label class="font-label-lg text-on-surface-variant">Cliente (Opcional)</label>
-                    <select id="cliente_id"
-                            class="w-full bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-2 px-3 font-body-sm transition-all outline-none">
-                        <option value="">— Sin cliente —</option>
-                        @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            </div>
+            <div class="space-y-1">
+                <label class="font-label-lg text-on-surface-variant">Descripción de la Venta</label>
+                <input type="text" id="descripcion" placeholder="Ej: Polo azul talla M, 2 diseños delantero..."
+                       class="w-full bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-2 px-3 font-body-sm transition-all outline-none">
             </div>
         </section>
 
@@ -213,7 +208,7 @@
 <form id="form-venta" action="{{ route('ventas.store') }}" method="POST" class="hidden">
     @csrf
     <input type="hidden" name="fecha_venta" id="input-fecha">
-    <input type="hidden" name="cliente_id" id="input-cliente">
+    <input type="hidden" name="descripcion" id="input-descripcion">
     <input type="hidden" name="estado" id="input-estado">
     <input type="hidden" name="descuento_tipo" id="input-descuento-tipo">
     <input type="hidden" name="descuento_valor" id="input-descuento-valor">
@@ -236,7 +231,7 @@ function agregarAlCarrito(el) {
     if (existente) {
         if (existente.cantidad < stock) existente.cantidad++;
     } else {
-        carrito.push({ id, nombre, precio, stock, cantidad: 1 });
+        carrito.push({ id, nombre, precio, stock, cantidad: 1, adicional: 0, mostrarAdicional: false });
     }
     el.classList.add('active-row');
     setTimeout(() => el.classList.remove('active-row'), 300);
@@ -251,10 +246,34 @@ function cambiarCantidad(id, delta) {
     renderCarrito();
 }
 
+function toggleAdicional(id) {
+    const item = carrito.find(i => i.id == id);
+    if (!item) return;
+    item.mostrarAdicional = !item.mostrarAdicional;
+    renderCarrito();
+    if (item.mostrarAdicional) {
+        setTimeout(() => {
+            const input = document.getElementById('adicional-input-' + id);
+            if (input) input.focus();
+        }, 50);
+    }
+}
+
+function setAdicional(id, valor) {
+    const item = carrito.find(i => i.id == id);
+    if (!item) return;
+    item.adicional = Math.max(0, parseFloat(valor) || 0);
+    actualizarTotales();
+}
+
 function limpiarCarrito() {
     carrito = [];
     quitarDescuento();
     renderCarrito();
+}
+
+function precioFinal(item) {
+    return item.precio + item.adicional;
 }
 
 function renderCarrito() {
@@ -266,24 +285,54 @@ function renderCarrito() {
         count.textContent = '0 items seleccionados';
     } else {
         count.textContent = carrito.length + ' item' + (carrito.length > 1 ? 's' : '') + ' seleccionado' + (carrito.length > 1 ? 's' : '');
-        container.innerHTML = carrito.map(item => `
-            <div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-white group">
-                <div class="flex-1 min-w-0">
-                    <p class="font-label-lg text-on-surface truncate">${item.nombre}</p>
-                    <p class="font-label-sm text-on-surface-variant">P. Unit: S/ ${item.precio.toFixed(2)}</p>
+        container.innerHTML = carrito.map(item => {
+            const pf = precioFinal(item);
+            const adicionalBadge = item.adicional > 0
+                ? `<span class="text-secondary font-label-sm ml-1">(+S/ ${item.adicional.toFixed(2)} adicional)</span>`
+                : '';
+            const panelAdicional = item.mostrarAdicional ? `
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="font-label-sm text-on-surface-variant shrink-0">+ Adicional S/</span>
+                    <input id="adicional-input-${item.id}" type="number" min="0" step="0.50"
+                           value="${item.adicional > 0 ? item.adicional : ''}"
+                           placeholder="0.00"
+                           oninput="setAdicional('${item.id}', this.value)"
+                           class="w-24 bg-white border border-secondary/40 rounded-lg py-1 px-2 font-mono-data text-sm text-right focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all">
                 </div>
-                <div class="flex items-center gap-3 ml-3">
-                    <div class="flex items-center bg-surface-container-low rounded-lg border border-outline-variant">
-                        <button onclick="cambiarCantidad('${item.id}', -1)" class="px-2 py-1 text-primary hover:bg-primary/10 rounded-l-lg transition-colors">−</button>
-                        <span class="w-8 text-center font-mono-data text-on-surface">${item.cantidad}</span>
-                        <button onclick="cambiarCantidad('${item.id}', 1)" class="px-2 py-1 text-primary hover:bg-primary/10 rounded-r-lg transition-colors">+</button>
+            ` : '';
+
+            const btnAdicionalClass = item.adicional > 0
+                ? 'p-1.5 rounded-lg bg-secondary/10 text-secondary border border-secondary/30 transition-all'
+                : 'p-1.5 rounded-lg text-on-surface-variant border border-outline-variant hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30 transition-all';
+
+            return `
+            <div class="p-3 rounded-lg border border-outline-variant bg-white">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-label-lg text-on-surface truncate">${item.nombre}</p>
+                        <div class="flex flex-wrap items-center gap-1">
+                            <p class="font-label-sm text-on-surface-variant">S/ ${pf.toFixed(2)}/ud</p>
+                            ${adicionalBadge}
+                        </div>
+                        ${panelAdicional}
                     </div>
-                    <div class="text-right w-20">
-                        <p class="font-mono-data font-bold text-on-surface">S/ ${(item.precio * item.cantidad).toFixed(2)}</p>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="toggleAdicional('${item.id}')" title="Agregar costo adicional"
+                                class="${btnAdicionalClass}">
+                            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                        </button>
+                        <div class="flex items-center bg-surface-container-low rounded-lg border border-outline-variant">
+                            <button onclick="cambiarCantidad('${item.id}', -1)" class="px-2 py-1 text-primary hover:bg-primary/10 rounded-l-lg transition-colors">−</button>
+                            <span class="w-8 text-center font-mono-data text-on-surface">${item.cantidad}</span>
+                            <button onclick="cambiarCantidad('${item.id}', 1)" class="px-2 py-1 text-primary hover:bg-primary/10 rounded-r-lg transition-colors">+</button>
+                        </div>
+                        <div class="text-right w-20">
+                            <p class="font-mono-data font-bold text-on-surface">S/ ${(pf * item.cantidad).toFixed(2)}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     }
     actualizarTotales();
 }
@@ -331,7 +380,7 @@ function calcularDescuento(subtotal) {
 }
 
 function actualizarTotales() {
-    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
     const total = subtotal - descuento;
     const hayDescuento = descuento > 0;
@@ -353,7 +402,7 @@ function actualizarTotales() {
 }
 
 function setAdelanto50() {
-    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
     const total = subtotal - descuento;
     document.getElementById('adelanto-input').value = (total / 2).toFixed(2);
@@ -361,7 +410,7 @@ function setAdelanto50() {
 }
 
 function actualizarAdelanto() {
-    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
     const total = subtotal - descuento;
     const adelanto = Math.min(parseFloat(document.getElementById('adelanto-input').value) || 0, total);
@@ -379,13 +428,13 @@ function actualizarAdelanto() {
 function guardarVenta(estado) {
     if (carrito.length === 0) { alert('Agrega al menos un producto al carrito.'); return; }
 
-    const subtotal = carrito.reduce((sum, i) => sum + i.precio * i.cantidad, 0);
+    const subtotal = carrito.reduce((sum, i) => sum + precioFinal(i) * i.cantidad, 0);
     const descuento = calcularDescuento(subtotal);
     const descuentoVal = parseFloat(document.getElementById('descuento-input').value) || 0;
 
-    document.getElementById('input-fecha').value   = document.getElementById('fecha_venta').value;
-    document.getElementById('input-cliente').value  = document.getElementById('cliente_id').value;
-    document.getElementById('input-estado').value   = estado;
+    document.getElementById('input-fecha').value        = document.getElementById('fecha_venta').value;
+    document.getElementById('input-descripcion').value  = document.getElementById('descripcion').value;
+    document.getElementById('input-estado').value       = estado;
     document.getElementById('input-descuento-tipo').value  = (descuentoActivo && descuentoVal > 0) ? descuentoTipo : '';
     document.getElementById('input-descuento-valor').value = (descuentoActivo && descuentoVal > 0) ? descuentoVal : 0;
     document.getElementById('input-adelanto').value = parseFloat(document.getElementById('adelanto-input').value) || 0;
@@ -396,7 +445,7 @@ function guardarVenta(estado) {
         container.innerHTML += `
             <input type="hidden" name="productos[${i}][producto_id]"    value="${item.id}">
             <input type="hidden" name="productos[${i}][cantidad]"        value="${item.cantidad}">
-            <input type="hidden" name="productos[${i}][precio_unitario]" value="${item.precio}">
+            <input type="hidden" name="productos[${i}][precio_unitario]" value="${precioFinal(item).toFixed(2)}">
         `;
     });
 
