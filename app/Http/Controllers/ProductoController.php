@@ -166,10 +166,17 @@ class ProductoController extends Controller
             $query->orderBy($ordenar, $dir === 'desc' ? 'desc' : 'asc');
         }
 
-        $productos  = $query->paginate(20)->withQueryString();
-        $categorias = Categoria::orderBy('nombre')->get();
+        $productos      = $query->paginate(20)->withQueryString();
+        $categorias     = Categoria::orderBy('nombre')->get();
+        $totalProductos = Producto::count();
+        $bajoStock      = Producto::where('estado', 'bajo_stock')->count();
+        $agotados       = Producto::where('estado', 'agotado')->count();
+        $valorTotal     = Producto::sum(DB::raw('precio_venta * stock'));
 
-        return view('productos.detalle', compact('productos', 'categorias'));
+        return view('productos.detalle', compact(
+            'productos', 'categorias',
+            'totalProductos', 'bajoStock', 'agotados', 'valorTotal'
+        ));
     }
 
     public function buscar(Request $request)

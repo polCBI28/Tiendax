@@ -108,9 +108,14 @@ public function create()
                     'subtotal'        => $item['precio_unitario'] * $item['cantidad'],
                 ]);
 
-                // Descontar stock
+                // Descontar stock y actualizar estado
                 $producto = Producto::find($item['producto_id']);
                 $producto->decrement('stock', $item['cantidad']);
+                $nuevoStock = $producto->fresh()->stock;
+                $producto->update([
+                    'estado' => $nuevoStock <= 0 ? 'agotado'
+                        : ($nuevoStock <= $producto->stock_minimo ? 'bajo_stock' : 'en_stock'),
+                ]);
 
                 // Registrar movimiento
                 Movimiento::create([

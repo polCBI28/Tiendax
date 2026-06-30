@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Movimiento;
 use App\Models\Producto;
 use App\Models\Venta;
@@ -51,22 +52,23 @@ class MovimientoController extends Controller
             ->get()
             ->groupBy('fecha');
 
-        $movimientosTipoPorDia = Movimiento::whereIn(DB::raw('DATE(created_at)'), $fechas)
+        $movimientosTipoPorDia = Movimiento::whereIn('fecha', $fechas)
             ->select(
-                DB::raw('DATE(created_at) as fecha'),
+                'fecha',
                 'tipo',
                 DB::raw('COUNT(*) as total'),
                 DB::raw('SUM(cantidad) as unidades')
             )
             ->groupBy('fecha', 'tipo')
             ->get()
-            ->groupBy('fecha')
+            ->groupBy(fn($m) => $m->fecha->toDateString())
             ->map(fn($items) => $items->keyBy('tipo'));
 
-        $ajustesPorDia = Movimiento::where('motivo', 'not like', 'Venta %')
-            ->orWhereNull('motivo')
+        $ajustesPorDia = Movimiento::where(function ($q) {
+                $q->where('motivo', 'not like', 'Venta %')->orWhereNull('motivo');
+            })
             ->select(
-                DB::raw('DATE(created_at) as fecha'),
+                'fecha',
                 DB::raw('COUNT(*) as total_ajustes')
             )
             ->groupBy('fecha')
@@ -125,7 +127,7 @@ class MovimientoController extends Controller
             ->get();
 
         $ajustes = Movimiento::with('producto', 'user')
-            ->whereDate('created_at', $fecha)
+            ->whereDate('fecha', $fecha)
             ->where(function ($q) {
                 $q->where('motivo', 'not like', 'Venta %')->orWhereNull('motivo');
             })
@@ -139,8 +141,9 @@ class MovimientoController extends Controller
 
     public function create()
     {
-        $productos = Producto::where('activo', true)->get();
-        return view('movimientos.create', compact('productos'));
+        $categorias = Categoria::with('subcategorias')->orderBy('nombre')->get();
+        $productos  = Producto::where('activo', true)->orderBy('nombre')->get();
+        return view('movimientos.create', compact('categorias', 'productos'));
     }
 
     public function store(Request $request)
@@ -150,6 +153,7 @@ class MovimientoController extends Controller
             'tipo'        => 'required|in:entrada,salida',
             'cantidad'    => 'required|integer|min:1',
             'motivo'      => 'nullable|string|max:255',
+            'fecha'       => 'required|date',
         ]);
 
         $producto = Producto::find($request->producto_id);
@@ -164,6 +168,7 @@ class MovimientoController extends Controller
             'tipo'        => $request->tipo,
             'cantidad'    => $request->cantidad,
             'motivo'      => $request->motivo,
+            'fecha'       => $request->fecha,
         ]);
 
         if ($request->tipo === 'entrada') {

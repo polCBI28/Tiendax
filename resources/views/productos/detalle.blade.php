@@ -25,6 +25,38 @@
     </div>
 </div>
 
+{{-- KPI Cards --}}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
+        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Productos</p>
+        <div class="flex items-end justify-between">
+            <span class="font-headline-md text-headline-md">{{ $totalProductos }}</span>
+            <span class="material-symbols-outlined text-primary text-[24px]">inventory_2</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
+        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Bajo Stock</p>
+        <div class="flex items-end justify-between">
+            <span class="font-headline-md text-headline-md text-secondary">{{ $bajoStock }}</span>
+            <span class="text-secondary font-label-sm">Acción requerida</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
+        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Agotados</p>
+        <div class="flex items-end justify-between">
+            <span class="font-headline-md text-headline-md text-error">{{ $agotados }}</span>
+            <span class="material-symbols-outlined text-error text-[24px]">remove_shopping_cart</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
+        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Valor en Inventario</p>
+        <div class="flex items-end justify-between">
+            <span class="font-headline-md text-headline-md text-tertiary">S/ {{ number_format($valorTotal, 0) }}</span>
+            <span class="material-symbols-outlined text-tertiary text-[24px]">paid</span>
+        </div>
+    </div>
+</div>
+
 {{-- Filtros --}}
 <form method="GET" action="{{ route('productos.detalle') }}"
       class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-4 mb-6">

@@ -49,13 +49,13 @@
         $icon    = $categoria->icono ?? $icons[$i];
         $iconBg  = $iconBgs[$i];
     @endphp
-    <div class="lg:col-span-{{ $span }} group category-card relative overflow-hidden rounded-3xl bg-surface-container-lowest border border-outline-variant shadow-sm transition-all duration-300 hover:shadow-xl cursor-pointer"
+    <div class="lg:col-span-{{ $span }} group category-card relative overflow-hidden rounded-3xl bg-surface-container-lowest border border-outline-variant shadow-sm transition-all duration-300 hover:shadow-2xl hover:scale-[1.015] cursor-pointer"
          style="transform: scale(1);">
-        {{-- Link invisible que cubre toda la tarjeta --}}
+        {{-- Link que cubre toda la tarjeta --}}
         <a href="{{ route('categorias.show', $categoria) }}" class="absolute inset-0 z-10" aria-label="Ver {{ $categoria->nombre }}"></a>
         <div class="absolute inset-0 z-0">
             @if($categoria->imagen)
-                <img class="category-image w-full h-full object-cover transition-transform duration-700"
+                <img class="category-image w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                      src="{{ asset('storage/' . $categoria->imagen) }}"
                      alt="{{ $categoria->nombre }}">
             @else
@@ -63,7 +63,13 @@
             @endif
             <div class="absolute inset-0 {{ $overlay }}"></div>
         </div>
-        <div class="relative z-10 {{ $height }} flex flex-col justify-end p-8 text-white">
+        <div class="relative {{ $height }} flex flex-col justify-end p-8 text-white">
+            {{-- Indicador "Ver subcategorías" en hover --}}
+            <div class="absolute top-5 right-5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 border border-white/30">
+                <span class="font-label-sm text-white">Ver subcategorías</span>
+                <span class="material-symbols-outlined text-white text-[16px]">arrow_forward</span>
+            </div>
+
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">
                     <div class="p-3 glass-effect rounded-2xl">
