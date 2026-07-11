@@ -26,7 +26,7 @@
                 @endif
             </div>
         </div>
-        <a href="{{ route('categorias.edit', $categoria) }}"
+        <a href="{{ route('categorias.index', ['editar' => $categoria->id]) }}"
            class="shrink-0 px-3 py-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white font-label-sm hover:bg-white/30 transition flex items-center gap-1">
             <span class="material-symbols-outlined text-[16px]">edit</span> Editar
         </a>
@@ -76,7 +76,7 @@
 {{-- Cabecera subcategorías --}}
 <div class="flex items-center justify-between mb-4">
     <h3 class="font-headline-md text-headline-md text-on-surface">Subcategorías</h3>
-    <a href="{{ route('subcategorias.create') }}"
+    <a href="{{ route('subcategorias.index', ['crear' => 1]) }}"
        class="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary/10 text-secondary rounded-lg font-label-sm hover:bg-secondary/20 transition-all">
         <span class="material-symbols-outlined text-[16px]">add</span>
         Nueva subcategoría
@@ -88,7 +88,7 @@
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant py-16 text-center text-on-surface-variant">
     <span class="material-symbols-outlined text-[48px] block mb-3 opacity-30">account_tree</span>
     <p class="font-label-lg">No hay subcategorías en esta categoría.</p>
-    <a href="{{ route('subcategorias.create') }}" class="text-primary font-label-sm hover:underline mt-2 inline-block">
+    <a href="{{ route('subcategorias.index', ['crear' => 1]) }}" class="text-primary font-label-sm hover:underline mt-2 inline-block">
         Agregar la primera
     </a>
 </div>

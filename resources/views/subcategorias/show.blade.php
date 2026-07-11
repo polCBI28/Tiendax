@@ -19,12 +19,12 @@
             @endif
         </div>
         <div class="flex items-center gap-3 shrink-0">
-            <a href="{{ route('productos.create') }}"
+            <a href="{{ route('productos.index', ['crear' => 1]) }}"
                class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-lg hover:brightness-110 transition-all">
                 <span class="material-symbols-outlined text-[18px]">add</span>
                 Agregar producto
             </a>
-            <a href="{{ route('subcategorias.edit', $subcategoria) }}"
+            <a href="{{ route('subcategorias.index', ['editar' => $subcategoria->id]) }}"
                class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface rounded-lg font-label-lg hover:bg-outline-variant/20 transition-all">
                 <span class="material-symbols-outlined text-[18px]">edit</span>
                 Editar
@@ -80,7 +80,7 @@
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant py-20 text-center text-on-surface-variant">
     <span class="material-symbols-outlined text-[56px] block mb-3 opacity-20">inventory_2</span>
     <p class="font-label-lg mb-2">No hay productos en esta subcategoría.</p>
-    <a href="{{ route('productos.create') }}" class="text-primary font-label-sm hover:underline">
+    <a href="{{ route('productos.index', ['crear' => 1]) }}" class="text-primary font-label-sm hover:underline">
         Agregar el primero
     </a>
 </div>

@@ -17,7 +17,7 @@
             <span class="material-symbols-outlined text-[18px]">inventory_2</span>
             Ver Inventario
         </a>
-        <a href="{{ route('productos.create') }}"
+        <a href="{{ route('productos.index', ['crear' => 1]) }}"
            class="flex items-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-lg hover:opacity-90 shadow-sm transition-all">
             <span class="material-symbols-outlined text-[18px]">add</span>
             Nuevo Producto
@@ -249,7 +249,7 @@
                                class="p-1.5 rounded-lg text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-all">
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                             </a>
-                            <a href="{{ route('productos.edit', $producto) }}"
+                            <a href="{{ route('productos.index', ['editar' => $producto->id]) }}"
                                title="Editar"
                                class="p-1.5 rounded-lg text-on-surface-variant hover:bg-secondary/10 hover:text-secondary transition-all">
                                 <span class="material-symbols-outlined text-[18px]">edit</span>

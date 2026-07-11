@@ -14,8 +14,9 @@ class Categoria extends Model
         'icono',
         'descripcion',
         'imagen',
-        'activo'
+        'activo',
     ];
+
     public function subcategorias()
     {
         return $this->hasMany(Subcategoria::class);

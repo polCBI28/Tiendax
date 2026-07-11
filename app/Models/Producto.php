@@ -12,7 +12,7 @@ class Producto extends Model
     protected $fillable = [
         'categoria_id', 'subcategoria_id', 'nombre', 'sku',
         'descripcion', 'precio_venta', 'precio_costo',
-        'stock', 'stock_minimo', 'imagen', 'estado', 'activo'
+        'stock', 'stock_minimo', 'imagen', 'estado', 'activo',
     ];
 
     public function categoria()

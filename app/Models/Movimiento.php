@@ -10,7 +10,7 @@ class Movimiento extends Model
     use HasFactory;
 
     protected $fillable = [
-        'producto_id', 'user_id', 'tipo', 'cantidad', 'motivo', 'fecha'
+        'producto_id', 'user_id', 'tipo', 'cantidad', 'motivo', 'fecha',
     ];
 
     protected $casts = [

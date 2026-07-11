@@ -8,7 +8,7 @@
     </nav>
     <div class="flex items-center justify-between">
         <h2 class="font-headline-lg text-headline-lg text-on-surface">{{ $producto->nombre }}</h2>
-        <a href="{{ route('productos.edit', $producto) }}"
+        <a href="{{ route('productos.index', ['editar' => $producto->id]) }}"
            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-lg hover:brightness-110 transition-all">
             <span class="material-symbols-outlined text-[18px]">edit</span>
             Editar

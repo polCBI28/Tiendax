@@ -1,226 +1,225 @@
 <x-layouts.app title="Panel de Control">
-
-{{-- Welcome Header --}}
-<header class="mb-8">
-    <h2 class="font-headline-lg text-headline-lg text-on-surface">Panel de Control</h2>
-    <p class="font-body-md text-on-surface-variant">Bienvenido de nuevo, {{ auth()->user()->name }}. Aquí tienes el resumen de hoy.</p>
-</header>
-
-{{-- KPI Cards --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex justify-between items-start mb-4">
-            <div class="p-3 bg-primary-container/10 rounded-lg text-primary">
-                <span class="material-symbols-outlined">payments</span>
-            </div>
-            <span class="font-label-sm text-green-600 bg-green-50 px-2 py-1 rounded">+{{ $crecimiento ?? '0' }}%</span>
+    <div class="space-y-8">
+        {{-- Header --}}
+        <div>
+            <flux:heading size="xl">Panel de Control</flux:heading>
+            <flux:subheading>Bienvenido de nuevo, {{ auth()->user()->name }}. Aquí tienes el resumen de hoy.</flux:subheading>
         </div>
-        <h3 class="font-label-lg text-on-surface-variant mb-1">Ventas del Día</h3>
-        <div class="flex items-baseline gap-2">
-            <span class="font-headline-md text-headline-md text-on-surface">S/ {{ number_format($ventasHoy ?? 0, 2) }}</span>
-        </div>
-    </div>
 
-    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex justify-between items-start mb-4">
-            <div class="p-3 bg-secondary-container/10 rounded-lg text-secondary">
-                <span class="material-symbols-outlined">inventory</span>
-            </div>
-            <span class="font-label-sm text-error bg-error-container/20 px-2 py-1 rounded">Acción Requerida</span>
-        </div>
-        <h3 class="font-label-lg text-on-surface-variant mb-1">Productos Bajo Stock</h3>
-        <div class="flex items-baseline gap-2">
-            <span class="font-headline-md text-headline-md text-on-surface">{{ $bajoStock ?? 0 }} Artículos</span>
-        </div>
-    </div>
-
-    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex justify-between items-start mb-4">
-            <div class="p-3 bg-tertiary-container/10 rounded-lg text-tertiary">
-                <span class="material-symbols-outlined">pending_actions</span>
-            </div>
-            <span class="font-label-sm text-tertiary bg-tertiary-fixed/20 px-2 py-1 rounded">En Proceso</span>
-        </div>
-        <h3 class="font-label-lg text-on-surface-variant mb-1">Pedidos Pendientes</h3>
-        <div class="flex items-baseline gap-2">
-            <span class="font-headline-md text-headline-md text-on-surface">{{ $ventasPendientes ?? 0 }}</span>
-        </div>
-    </div>
-</div>
-
-{{-- Gráfico + Accesos Directos --}}
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-    <div class="lg:col-span-8 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h3 class="font-headline-md text-headline-md text-on-surface">Ventas Semanales</h3>
-                <p class="font-body-sm text-on-surface-variant">Rendimiento de los últimos 7 días</p>
-            </div>
-            <span class="font-label-sm text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant">
-                {{ now()->subDays(6)->format('d/m') }} – {{ now()->format('d/m/Y') }}
-            </span>
-        </div>
-        <div class="relative h-64">
-            <canvas id="ventasChart"></canvas>
-        </div>
-    </div>
-
-    <div class="lg:col-span-4">
-        <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm h-full flex flex-col">
-            <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Accesos Directos</h3>
-
-            {{-- Acción principal --}}
-            <a href="{{ route('ventas.create') }}"
-               class="w-full flex items-center justify-between p-4 bg-primary text-on-primary rounded-xl hover:brightness-110 active:scale-[0.98] transition-all shadow-sm group mb-4">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-[22px]">add_shopping_cart</span>
-                    <div>
-                        <span class="font-label-lg block">Registrar Venta</span>
-                        <span class="font-label-sm text-on-primary/70">Punto de venta rápido</span>
+        {{-- KPI Cards --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <flux:card class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                        <flux:icon name="banknotes" variant="solid" class="text-blue-600 dark:text-blue-400 w-5 h-5" />
+                    </div>
+                    <flux:badge color="emerald" size="sm" inset="top bottom">+{{ $crecimiento ?? '0' }}%</flux:badge>
+                </div>
+                <div>
+                    <flux:text class="text-sm text-zinc-500">Ventas del Día</flux:text>
+                    <div class="flex items-baseline gap-1">
+                        <flux:heading size="xl">S/ {{ number_format($ventasHoy ?? 0, 2) }}</flux:heading>
                     </div>
                 </div>
-                <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
-            </a>
+            </flux:card>
 
-            {{-- Grid de accesos --}}
-            <div class="grid grid-cols-2 gap-2.5 flex-1">
-                <a href="{{ route('productos.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-primary/8 border border-transparent hover:border-primary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-                        <span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+            <flux:card class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="p-2.5 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                        <flux:icon name="archive-box" variant="solid" class="text-amber-600 dark:text-amber-400 w-5 h-5" />
                     </div>
-                    <span class="font-label-md text-on-surface leading-tight">Productos</span>
-                </a>
+                    <flux:badge color="red" size="sm" inset="top bottom">Acción Requerida</flux:badge>
+                </div>
+                <div>
+                    <flux:text class="text-sm text-zinc-500">Productos Bajo Stock</flux:text>
+                    <div class="flex items-baseline gap-1">
+                        <flux:heading size="xl">{{ $bajoStock ?? 0 }}</flux:heading>
+                        <flux:text class="text-zinc-500">Artículos</flux:text>
+                    </div>
+                </div>
+            </flux:card>
 
-                <a href="{{ route('ventas.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-secondary/8 border border-transparent hover:border-secondary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/15 transition-colors">
-                        <span class="material-symbols-outlined text-secondary text-[22px]">receipt_long</span>
+            <flux:card class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="p-2.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                        <flux:icon name="clock" variant="solid" class="text-purple-600 dark:text-purple-400 w-5 h-5" />
                     </div>
-                    <span class="font-label-md text-on-surface leading-tight">Ventas</span>
-                </a>
+                    <flux:badge color="amber" size="sm" inset="top bottom">En Proceso</flux:badge>
+                </div>
+                <div>
+                    <flux:text class="text-sm text-zinc-500">Pedidos Pendientes</flux:text>
+                    <div class="flex items-baseline gap-1">
+                        <flux:heading size="xl">{{ $ventasPendientes ?? 0 }}</flux:heading>
+                        <flux:text class="text-zinc-500">Pedidos</flux:text>
+                    </div>
+                </div>
+            </flux:card>
+        </div>
 
-                <a href="{{ route('clientes.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-tertiary/8 border border-transparent hover:border-tertiary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center group-hover:bg-tertiary/15 transition-colors">
-                        <span class="material-symbols-outlined text-tertiary text-[22px]">group</span>
+        {{-- Chart + Quick Access --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <flux:card class="lg:col-span-8 space-y-6">
+                <div class="flex items-start justify-between">
+                    <div class="space-y-1">
+                        <flux:heading>Ventas Semanales</flux:heading>
+                        <flux:text>Rendimiento de los últimos 7 días</flux:text>
                     </div>
-                    <span class="font-label-md text-on-surface leading-tight">Clientes</span>
-                </a>
+                    <flux:badge color="zinc" variant="outline" inset="top bottom">
+                        {{ now()->subDays(6)->format('d/m') }} – {{ now()->format('d/m/Y') }}
+                    </flux:badge>
+                </div>
+                <div class="relative h-64">
+                    <canvas id="ventasChart"></canvas>
+                    <div id="ventasChartEmpty" class="absolute inset-0 hidden items-center justify-center flex-col gap-2 text-zinc-400">
+                        <flux:icon name="chart-bar" class="w-10 h-10 opacity-30" />
+                        <flux:text class="opacity-50">Sin ventas en los últimos 7 días</flux:text>
+                    </div>
+                </div>
+            </flux:card>
 
-                <a href="{{ route('categorias.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-primary/8 border border-transparent hover:border-primary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-                        <span class="material-symbols-outlined text-primary text-[22px]">category</span>
-                    </div>
-                    <span class="font-label-md text-on-surface leading-tight">Categorías</span>
-                </a>
+            <div class="lg:col-span-4 space-y-4">
+                <flux:card class="space-y-4 h-full flex flex-col">
+                    <flux:heading>Accesos Directos</flux:heading>
 
-                <a href="{{ route('movimientos.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-secondary/8 border border-transparent hover:border-secondary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/15 transition-colors">
-                        <span class="material-symbols-outlined text-secondary text-[22px]">swap_vert</span>
-                    </div>
-                    <span class="font-label-md text-on-surface leading-tight">Movimientos</span>
-                </a>
+                    <flux:button :href="route('ventas.index', ['crear' => 1])" variant="primary" class="w-full" icon="shopping-cart">
+                        Registrar Venta
+                    </flux:button>
 
-                <a href="{{ route('reportes.index') }}"
-                   class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-tertiary/8 border border-transparent hover:border-tertiary/20 active:scale-[0.97] transition-all group text-center">
-                    <div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center group-hover:bg-tertiary/15 transition-colors">
-                        <span class="material-symbols-outlined text-tertiary text-[22px]">bar_chart</span>
+                    <div class="grid grid-cols-2 gap-3 flex-1">
+                        <flux:button :href="route('productos.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="archive-box">
+                            Productos
+                        </flux:button>
+                        <flux:button :href="route('ventas.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="document-text">
+                            Ventas
+                        </flux:button>
+                        <flux:button :href="route('clientes.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="users">
+                            Clientes
+                        </flux:button>
+                        <flux:button :href="route('categorias.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="tag">
+                            Categorías
+                        </flux:button>
+                        <flux:button :href="route('movimientos.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="arrows-up-down">
+                            Movimientos
+                        </flux:button>
+                        <flux:button :href="route('reportes.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="presentation-chart-line">
+                            Reportes
+                        </flux:button>
                     </div>
-                    <span class="font-label-md text-on-surface leading-tight">Reportes</span>
-                </a>
+                </flux:card>
             </div>
         </div>
-    </div>
 
-</div>
-
-{{-- Últimos Movimientos --}}
-<div class="mt-8 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
-    <div class="flex justify-between items-center mb-6">
-        <h3 class="font-headline-md text-headline-md text-on-surface">Últimos Movimientos</h3>
-        <a href="{{ route('ventas.index') }}" class="text-primary font-label-lg hover:underline transition-all">Ver todo</a>
+        {{-- Recent Movements --}}
+        <flux:card class="space-y-4">
+            <div class="flex items-center justify-between">
+                <flux:heading>Últimos Movimientos</flux:heading>
+                <flux:button :href="route('ventas.index')" variant="ghost" size="sm">Ver todo</flux:button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-sm text-zinc-500 border-b border-zinc-200 dark:border-zinc-700 uppercase tracking-wider">
+                            <th class="pb-3 font-semibold">Producto / Servicio</th>
+                            <th class="pb-3 font-semibold">Fecha</th>
+                            <th class="pb-3 font-semibold">Estado</th>
+                            <th class="pb-3 font-semibold text-right">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        @forelse($ultimasVentas ?? [] as $venta)
+                        @php
+                            $primerProducto = $venta->detalles->first()?->producto?->nombre ?? 'Sin producto';
+                            $totalItems     = $venta->detalles->count();
+                            $nombreCliente  = $venta->cliente?->nombre;
+                        @endphp
+                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                            <td class="py-3.5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center shrink-0">
+                                        <flux:icon name="document-text" class="text-zinc-500 w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ $primerProducto }}@if($totalItems > 1) <span class="text-zinc-400 font-normal">+{{ $totalItems - 1 }} más</span>@endif</p>
+                                        <p class="text-xs text-zinc-500">
+                                            {{ $venta->numero_boleta }}
+                                            @if($nombreCliente) · {{ $nombreCliente }}@endif
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3.5 text-sm text-zinc-500">
+                                {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}
+                            </td>
+                            <td class="py-3.5">
+                                @if($venta->estado === 'completado')
+                                    <flux:badge color="emerald" size="sm" inset="top bottom">Completado</flux:badge>
+                                @elseif($venta->estado === 'pendiente')
+                                    <flux:badge color="amber" size="sm" inset="top bottom">Pendiente</flux:badge>
+                                @else
+                                    <flux:badge color="zinc" size="sm" inset="top bottom">{{ ucfirst($venta->estado) }}</flux:badge>
+                                @endif
+                            </td>
+                            <td class="py-3.5 text-right font-mono text-sm text-zinc-900 dark:text-zinc-100">S/ {{ number_format($venta->total, 2) }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="py-12 text-center text-zinc-400">
+                                No hay movimientos aún.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </flux:card>
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left">
-            <thead>
-                <tr class="font-label-sm text-outline border-b border-outline-variant/30 uppercase tracking-wider">
-                    <th class="pb-4 font-semibold">Producto / Servicio</th>
-                    <th class="pb-4 font-semibold">Fecha</th>
-                    <th class="pb-4 font-semibold">Estado</th>
-                    <th class="pb-4 font-semibold text-right">Monto</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-outline-variant/10">
-                @forelse($ultimasVentas ?? [] as $venta)
-                @php
-                    $primerProducto = $venta->detalles->first()?->producto?->nombre ?? 'Sin producto';
-                    $totalItems     = $venta->detalles->count();
-                    $nombreCliente  = $venta->cliente?->nombre;
-                @endphp
-                <tr class="hover:bg-surface-container-low transition-colors">
-                    <td class="py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-primary-container/10 rounded-lg flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary text-[20px]">receipt_long</span>
-                            </div>
-                            <div>
-                                <p class="font-label-lg text-on-surface">{{ $primerProducto }}@if($totalItems > 1) <span class="text-on-surface-variant font-normal">+{{ $totalItems - 1 }} más</span>@endif</p>
-                                <p class="font-label-sm text-on-surface-variant">
-                                    {{ $venta->numero_boleta }}
-                                    @if($nombreCliente) · {{ $nombreCliente }}@endif
-                                </p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="py-4 font-body-sm text-on-surface-variant">
-                        {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}
-                    </td>
-                    <td class="py-4">
-                        @if($venta->estado === 'completado')
-                            <span class="px-2 py-1 bg-green-50 text-green-700 font-label-sm rounded-full font-medium">Completado</span>
-                        @elseif($venta->estado === 'pendiente')
-                            <span class="px-2 py-1 bg-primary-container/20 text-primary font-label-sm rounded-full font-medium">Pendiente</span>
-                        @else
-                            <span class="px-2 py-1 bg-surface-container-high text-on-surface-variant font-label-sm rounded-full font-medium">{{ ucfirst($venta->estado) }}</span>
-                        @endif
-                    </td>
-                    <td class="py-4 text-right font-mono-data text-on-surface">S/ {{ number_format($venta->total, 2) }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="py-12 text-center text-on-surface-variant font-label-lg">
-                        No hay movimientos aún.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
 
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
 (function () {
-    const ctx = document.getElementById('ventasChart').getContext('2d');
+    const datos = @json($datosSemanales);
+    const labels = @json($labelsSemanales);
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-    gradient.addColorStop(0, 'rgba(36, 56, 156, 0.18)');
-    gradient.addColorStop(1, 'rgba(36, 56, 156, 0.01)');
+    const canvas = document.getElementById('ventasChart');
+    const emptyMsg = document.getElementById('ventasChartEmpty');
+
+    const hayDatos = datos.some(v => v > 0);
+
+    if (!hayDatos) {
+        canvas.style.display = 'none';
+        if (emptyMsg) emptyMsg.style.display = 'flex';
+        return;
+    }
+
+    if (emptyMsg) emptyMsg.style.display = 'none';
+
+    const ctx = canvas.getContext('2d');
+
+    // El gradiente se crea dentro de un plugin para usar las dimensiones reales del chart
+    const gradientPlugin = {
+        id: 'dynamicGradient',
+        beforeDatasetsDraw(chart) {
+            const { ctx: c, chartArea: { top, bottom } } = chart;
+            const grad = c.createLinearGradient(0, top, 0, bottom);
+            grad.addColorStop(0, 'rgba(36, 56, 156, 0.22)');
+            grad.addColorStop(1, 'rgba(36, 56, 156, 0.02)');
+            chart.data.datasets[0].backgroundColor = grad;
+        }
+    };
+
+    const maxValor = Math.max(...datos);
 
     new Chart(ctx, {
         type: 'bar',
+        plugins: [gradientPlugin],
         data: {
-            labels: @json($labelsSemanales),
+            labels: labels,
             datasets: [{
                 label: 'Ventas',
-                data: @json($datosSemanales),
-                backgroundColor: gradient,
+                data: datos,
+                backgroundColor: 'transparent',
                 borderColor: '#24389c',
                 borderWidth: 2,
                 borderRadius: 8,
@@ -252,6 +251,8 @@
                     ticks: { color: '#454652', font: { size: 12 } }
                 },
                 y: {
+                    beginAtZero: true,
+                    suggestedMax: maxValor > 0 ? maxValor * 1.2 : 100,
                     grid: { color: '#e1e3e4', lineWidth: 1 },
                     border: { display: false, dash: [4, 4] },
                     ticks: {

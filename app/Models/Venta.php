@@ -13,7 +13,7 @@ class Venta extends Model
         'cliente_id', 'user_id', 'numero_boleta',
         'fecha_venta', 'descripcion', 'total', 'adelanto',
         'descuento_tipo', 'descuento_valor',
-        'recargo_tipo', 'recargo_valor', 'estado'
+        'recargo_tipo', 'recargo_valor', 'estado',
     ];
 
     public function cliente()

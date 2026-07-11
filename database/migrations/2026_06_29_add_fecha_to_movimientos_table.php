@@ -13,7 +13,7 @@ return new class extends Migration
             $table->date('fecha')->nullable()->after('motivo');
         });
 
-        DB::statement("UPDATE movimientos SET fecha = DATE(created_at)");
+        DB::statement('UPDATE movimientos SET fecha = DATE(created_at)');
     }
 
     public function down(): void

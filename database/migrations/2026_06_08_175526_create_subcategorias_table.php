@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('subcategorias', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
-        $table->string('nombre');
-        $table->string('descripcion')->nullable();
-        $table->boolean('activo')->default(true);
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('subcategorias', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
+            $table->string('nombre');
+            $table->string('descripcion')->nullable();
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

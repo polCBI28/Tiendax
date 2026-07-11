@@ -17,7 +17,7 @@
             <span class="material-symbols-outlined text-[18px]">receipt_long</span>
             Ver Registro
         </a>
-        <a href="{{ route('ventas.create') }}"
+        <a href="{{ route('ventas.index', ['crear' => 1]) }}"
            class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-lg hover:opacity-90 shadow-sm transition-all">
             <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
             Nueva Venta
