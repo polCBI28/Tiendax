@@ -47,8 +47,11 @@
                         @elseif($imagenActual)
                             <img src="{{ asset('storage/' . $imagenActual) }}" class="w-full h-32 object-cover rounded-lg border border-zinc-200 dark:border-white/10">
                         @endif
-                        <input type="file" wire:model="imagen" accept="image/*"
-                               class="w-full text-sm text-zinc-600 dark:text-zinc-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-zinc-800/5 dark:file:bg-white/10 file:text-zinc-800 dark:file:text-white file:font-medium hover:file:bg-zinc-800/10 dark:hover:file:bg-white/20 transition-all">
+                        <label for="producto-imagen-input" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg border border-dashed border-zinc-300 dark:border-white/20 text-sm text-zinc-500 dark:text-zinc-400 cursor-pointer hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
+                            <flux:icon.arrow-up-tray variant="micro" />
+                            <span>{{ $imagen || $imagenActual ? 'Cambiar imagen' : 'Subir imagen' }}</span>
+                        </label>
+                        <input id="producto-imagen-input" type="file" wire:model="imagen" accept="image/*" class="sr-only">
                         @error('imagen') <flux:text size="sm" class="text-red-600 dark:text-red-400">{{ $message }}</flux:text> @enderror
                     </div>
 

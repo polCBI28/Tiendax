@@ -58,5 +58,6 @@
     <livewire:admin.categoria.categoria-header />
     <livewire:admin.categoria.categoria-table />
     <livewire:admin.categoria.categoria-form />
+    <livewire:admin.categoria.categoria-import />
 
 </div>

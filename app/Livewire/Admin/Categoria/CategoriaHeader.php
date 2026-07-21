@@ -12,6 +12,11 @@ class CategoriaHeader extends Component
         $this->dispatch('abrir-formulario-categoria');
     }
 
+    public function importar(): void
+    {
+        $this->dispatch('abrir-importar-categoria');
+    }
+
     public function render(): View
     {
         return view('livewire.admin.categoria.categoria-header');

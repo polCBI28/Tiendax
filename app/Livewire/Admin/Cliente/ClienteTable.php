@@ -2,12 +2,17 @@
 
 namespace App\Livewire\Admin\Cliente;
 
+use App\Exports\ClientesExport;
 use App\Models\Cliente;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ClienteTable extends Component
 {
@@ -78,7 +83,7 @@ class ClienteTable extends Component
         $this->mensaje = 'Cliente guardado correctamente.';
     }
 
-    public function render(): View
+    protected function filteredQuery(): Builder
     {
         $query = Cliente::query();
 
@@ -93,8 +98,30 @@ class ClienteTable extends Component
             $query->orderBy($this->ordenar, $this->dir === 'desc' ? 'desc' : 'asc');
         }
 
+        return $query;
+    }
+
+    public function exportarExcel(): BinaryFileResponse
+    {
+        return (new ClientesExport($this->filteredQuery()))
+            ->download('clientes-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportarPdf(): StreamedResponse
+    {
+        $clientes = $this->filteredQuery()->get();
+        $pdf = Pdf::loadView('exports.clientes-pdf', ['clientes' => $clientes]);
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'clientes-'.now()->format('Y-m-d').'.pdf'
+        );
+    }
+
+    public function render(): View
+    {
         return view('livewire.admin.cliente.cliente-table', [
-            'clientes' => $query->paginate(10),
+            'clientes' => $this->filteredQuery()->paginate(10),
         ]);
     }
 }

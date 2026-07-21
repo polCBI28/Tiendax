@@ -12,6 +12,11 @@ class ProductoHeader extends Component
         $this->dispatch('abrir-formulario-producto');
     }
 
+    public function importar(): void
+    {
+        $this->dispatch('abrir-importar-producto');
+    }
+
     public function render(): View
     {
         return view('livewire.admin.producto.producto-header');

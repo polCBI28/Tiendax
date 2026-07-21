@@ -57,36 +57,42 @@
             <div class="p-4 border-b border-zinc-200 dark:border-white/10">
                 <flux:heading size="sm">Top 10 Productos Más Vendidos</flux:heading>
             </div>
-            <flux:table>
-                <flux:table.columns>
-                    <flux:table.column class="w-[8%]">#</flux:table.column>
-                    <flux:table.column class="w-[52%]">Producto</flux:table.column>
-                    <flux:table.column align="end" class="w-[20%]">Unidades</flux:table.column>
-                    <flux:table.column align="end" class="w-[20%]">Ingresos</flux:table.column>
-                </flux:table.columns>
-                <flux:table.rows>
-                    @forelse($topProductos as $i => $item)
-                    <flux:table.row wire:key="top-{{ $item->producto_id }}">
-                        <flux:table.cell>{{ $i + 1 }}</flux:table.cell>
-                        <flux:table.cell>
-                            <p class="font-medium text-zinc-800 dark:text-white">{{ $item->producto?->nombre ?? '—' }}</p>
-                            <p class="text-xs text-zinc-400">{{ $item->producto?->sku }}</p>
-                        </flux:table.cell>
-                        <flux:table.cell align="end">{{ number_format($item->total_vendido) }}</flux:table.cell>
-                        <flux:table.cell align="end" variant="strong" class="text-emerald-600 dark:text-emerald-400">S/ {{ number_format($item->total_ingresos, 2) }}</flux:table.cell>
-                    </flux:table.row>
-                    @empty
-                    <flux:table.row>
-                        <flux:table.cell colspan="4">
-                            <div class="flex flex-col items-center gap-3 py-12 text-zinc-400">
-                                <flux:icon.chart-bar class="size-10" />
-                                <flux:text>Sin datos de ventas aún.</flux:text>
-                            </div>
-                        </flux:table.cell>
-                    </flux:table.row>
-                    @endforelse
-                </flux:table.rows>
-            </flux:table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5">
+                            <th class="text-left px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400 w-12">#</th>
+                            <th class="text-left px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400">Producto</th>
+                            <th class="text-right px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400 w-28">Unidades</th>
+                            <th class="text-right px-4 py-3 font-medium text-zinc-500 dark:text-zinc-400 w-36">Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($topProductos as $i => $item)
+                        <tr class="border-b border-zinc-200 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="px-4 py-3 text-zinc-500 dark:text-zinc-400">{{ $i + 1 }}</td>
+                            <td class="px-4 py-3">
+                                <p class="font-medium text-zinc-800 dark:text-white">{{ $item->producto?->nombre ?? '—' }}</p>
+                                <p class="text-xs text-zinc-400">{{ $item->producto?->sku }}</p>
+                            </td>
+                            <td class="px-4 py-3 text-right text-zinc-600 dark:text-zinc-300">{{ number_format($item->total_vendido) }}</td>
+                            <td class="px-4 py-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">S/ {{ number_format($item->total_ingresos, 2) }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-4 py-12 text-center text-zinc-400">
+                                <div class="flex flex-col items-center gap-3">
+                                    <svg class="w-10 h-10 text-zinc-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <p>Sin datos de ventas aún.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </flux:card>
 
         {{-- Resumen mensual --}}

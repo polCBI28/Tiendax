@@ -102,12 +102,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             <flux:input wire:model="email" label="Correo electrónico" type="email" name="email" required autofocus autocomplete="email" placeholder="correo@ejemplo.com" />
 
             <flux:field>
-                <div class="flex justify-between mb-3">
-                    <flux:label>Contraseña</flux:label>
-                    <x-text-link href="{{ route('password.request') }}" class="text-sm">
-                        ¿Olvidaste tu contraseña?
-                    </x-text-link>
-                </div>
+                <flux:label>Contraseña</flux:label>
                 <flux:input wire:model="password" type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
                 <flux:error name="password" />
             </flux:field>
@@ -126,9 +121,4 @@ new #[Layout('components.layouts.auth')] class extends Component {
             </flux:button>
         </form>
     </flux:card>
-
-    <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        ¿No tienes cuenta?
-        <x-text-link href="{{ route('register') }}">Registrarse</x-text-link>
-    </div>
 </div>

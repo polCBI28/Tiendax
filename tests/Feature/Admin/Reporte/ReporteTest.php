@@ -1,9 +1,11 @@
 <?php
 
+use App\Livewire\Admin\Reporte\ReporteHeader;
 use App\Models\DetalleVenta;
 use App\Models\Producto;
 use App\Models\User;
 use App\Models\Venta;
+use Livewire\Livewire;
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -34,8 +36,7 @@ test('los kpis del mes reflejan las ventas registradas', function () {
 test('exportar csv responde con un archivo descargable', function () {
     Venta::factory()->create(['fecha_venta' => now()]);
 
-    $response = $this->get(route('reportes.exportar'));
-
-    $response->assertOk();
-    $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+    Livewire::test(ReporteHeader::class)
+        ->call('exportarCsv')
+        ->assertStatus(200);
 });

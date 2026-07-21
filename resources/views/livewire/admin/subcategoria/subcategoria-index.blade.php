@@ -41,5 +41,6 @@
     <livewire:admin.subcategoria.subcategoria-header />
     <livewire:admin.subcategoria.subcategoria-table />
     <livewire:admin.subcategoria.subcategoria-form />
+    <livewire:admin.subcategoria.subcategoria-import />
 
 </div>

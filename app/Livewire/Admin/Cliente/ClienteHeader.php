@@ -12,6 +12,11 @@ class ClienteHeader extends Component
         $this->dispatch('abrir-formulario-cliente');
     }
 
+    public function importar(): void
+    {
+        $this->dispatch('abrir-importar-cliente');
+    }
+
     public function render(): View
     {
         return view('livewire.admin.cliente.cliente-header');

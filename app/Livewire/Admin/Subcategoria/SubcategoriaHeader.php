@@ -12,6 +12,11 @@ class SubcategoriaHeader extends Component
         $this->dispatch('abrir-formulario-subcategoria');
     }
 
+    public function importar(): void
+    {
+        $this->dispatch('abrir-importar-subcategoria');
+    }
+
     public function render(): View
     {
         return view('livewire.admin.subcategoria.subcategoria-header');

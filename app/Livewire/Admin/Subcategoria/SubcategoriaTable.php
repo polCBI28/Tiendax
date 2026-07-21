@@ -2,13 +2,18 @@
 
 namespace App\Livewire\Admin\Subcategoria;
 
+use App\Exports\SubcategoriasExport;
 use App\Models\Categoria;
 use App\Models\Subcategoria;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubcategoriaTable extends Component
 {
@@ -82,7 +87,7 @@ class SubcategoriaTable extends Component
         $this->mensaje = 'Subcategoría guardada correctamente.';
     }
 
-    public function render(): View
+    protected function filteredQuery(): Builder
     {
         $query = Subcategoria::with('categoria')->withCount('productos');
 
@@ -98,8 +103,30 @@ class SubcategoriaTable extends Component
             $query->orderBy($this->ordenar, $this->dir === 'desc' ? 'desc' : 'asc');
         }
 
+        return $query;
+    }
+
+    public function exportarExcel(): BinaryFileResponse
+    {
+        return (new SubcategoriasExport($this->filteredQuery()))
+            ->download('subcategorias-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportarPdf(): StreamedResponse
+    {
+        $subcategorias = $this->filteredQuery()->get();
+        $pdf = Pdf::loadView('exports.subcategorias-pdf', ['subcategorias' => $subcategorias]);
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'subcategorias-'.now()->format('Y-m-d').'.pdf'
+        );
+    }
+
+    public function render(): View
+    {
         return view('livewire.admin.subcategoria.subcategoria-table', [
-            'subcategorias' => $query->paginate(10),
+            'subcategorias' => $this->filteredQuery()->paginate(10),
             'categorias' => Categoria::orderBy('nombre')->get(),
         ]);
     }

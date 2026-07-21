@@ -1,21 +1,23 @@
 <?php
 
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\MovimientoController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\ReporteController;
-use App\Http\Controllers\SubcategoriaController;
-use App\Http\Controllers\VentaController;
 use App\Livewire\Admin\Buscar\BuscarIndex;
 use App\Livewire\Admin\Categoria\CategoriaIndex;
+use App\Livewire\Admin\Categoria\CategoriaShow;
 use App\Livewire\Admin\Cliente\ClienteIndex;
+use App\Livewire\Admin\Cliente\ClienteShow;
 use App\Livewire\Admin\DetalleVenta\DetalleVentaIndex;
 use App\Livewire\Admin\Movimiento\MovimientoIndex;
+use App\Livewire\Admin\Movimiento\MovimientoShow;
 use App\Livewire\Admin\Producto\ProductoIndex;
+use App\Livewire\Admin\Producto\ProductoShow;
 use App\Livewire\Admin\Reporte\ReporteIndex;
+use App\Livewire\Admin\Rol\RolIndex;
 use App\Livewire\Admin\Subcategoria\SubcategoriaIndex;
+use App\Livewire\Admin\Subcategoria\SubcategoriaShow;
+use App\Livewire\Admin\Usuario\UsuarioIndex;
+use App\Livewire\Admin\Venta\VentaDetalleIndex;
 use App\Livewire\Admin\Venta\VentaIndex;
+use App\Livewire\Admin\Venta\VentaShow;
 use App\Models\Producto;
 use App\Models\Venta;
 use Illuminate\Support\Facades\Route;
@@ -63,30 +65,32 @@ Route::middleware(['auth'])->group(function () {
 
     // Catálogo
     Route::get('/categorias', CategoriaIndex::class)->name('categorias.index');
-    Route::get('/categorias/{categoria}', [CategoriaController::class, 'show'])->name('categorias.show');
+    Route::get('/categorias/{categoria}', CategoriaShow::class)->name('categorias.show');
     Route::get('/subcategorias', SubcategoriaIndex::class)->name('subcategorias.index');
-    Route::get('/subcategorias/{subcategoria}', [SubcategoriaController::class, 'show'])->name('subcategorias.show');
+    Route::get('/subcategorias/{subcategoria}', SubcategoriaShow::class)->name('subcategorias.show');
 
     // Inventario
-    Route::get('/productos/buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
-    Route::get('/productos/detalle', [ProductoController::class, 'detalle'])->name('productos.detalle');
     Route::get('/productos', ProductoIndex::class)->name('productos.index');
-    Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');
+    Route::get('/productos/{producto}', ProductoShow::class)->name('productos.show');
     Route::get('/movimientos', MovimientoIndex::class)->name('movimientos.index');
-    Route::get('/movimientos/{fecha}', [MovimientoController::class, 'show'])->name('movimientos.show');
+    Route::get('/movimientos/{fecha}', MovimientoShow::class)->name('movimientos.show');
 
     // Ventas
-    Route::get('/ventas/detalle', [VentaController::class, 'detalle'])->name('ventas.detalle');
-    Route::patch('/ventas/{venta}/completar-pago', [VentaController::class, 'completarPago'])->name('ventas.completar-pago');
+    Route::get('/ventas/detalle', VentaDetalleIndex::class)->name('ventas.detalle');
     Route::get('/clientes', ClienteIndex::class)->name('clientes.index');
-    Route::get('/clientes/{cliente}', [ClienteController::class, 'show'])->name('clientes.show');
+    Route::get('/clientes/{cliente}', ClienteShow::class)->name('clientes.show');
     Route::get('/ventas', VentaIndex::class)->name('ventas.index');
-    Route::get('/ventas/{venta}', [VentaController::class, 'show'])->name('ventas.show');
+    Route::get('/ventas/{venta}', VentaShow::class)->name('ventas.show');
     Route::get('/detalle-ventas', DetalleVentaIndex::class)->name('detalle-ventas.index');
 
     // Reportes
     Route::get('/reportes', ReporteIndex::class)->name('reportes.index');
-    Route::get('/reportes/exportar-csv', [ReporteController::class, 'exportarCsv'])->name('reportes.exportar');
+
+    // Administración (solo Super Admin)
+    Route::middleware(['role:Super Admin'])->group(function () {
+        Route::get('/usuarios', UsuarioIndex::class)->name('usuarios.index');
+        Route::get('/roles', RolIndex::class)->name('roles.index');
+    });
 
     // Settings
     Volt::route('/settings/profile', 'settings.profile')->name('settings.profile');

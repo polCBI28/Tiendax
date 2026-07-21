@@ -2,13 +2,18 @@
 
 namespace App\Livewire\Admin\Producto;
 
+use App\Exports\ProductosExport;
 use App\Models\Categoria;
 use App\Models\Producto;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductoTable extends Component
 {
@@ -87,7 +92,7 @@ class ProductoTable extends Component
         $this->mensaje = 'Producto guardado correctamente.';
     }
 
-    public function render(): View
+    protected function filteredQuery(): Builder
     {
         $query = Producto::with('categoria', 'subcategoria')
             ->withCount('detalleVentas as num_ventas')
@@ -109,8 +114,30 @@ class ProductoTable extends Component
             $query->orderBy($this->ordenar, $this->dir === 'desc' ? 'desc' : 'asc');
         }
 
+        return $query;
+    }
+
+    public function exportarExcel(): BinaryFileResponse
+    {
+        return (new ProductosExport($this->filteredQuery()))
+            ->download('productos-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportarPdf(): StreamedResponse
+    {
+        $productos = $this->filteredQuery()->get();
+        $pdf = Pdf::loadView('exports.productos-pdf', ['productos' => $productos]);
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'productos-'.now()->format('Y-m-d').'.pdf'
+        );
+    }
+
+    public function render(): View
+    {
         return view('livewire.admin.producto.producto-table', [
-            'productos' => $query->paginate(10),
+            'productos' => $this->filteredQuery()->paginate(10),
             'categorias' => Categoria::orderBy('nombre')->get(),
         ]);
     }

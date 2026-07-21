@@ -3,7 +3,12 @@
         <flux:heading size="xl">Detalle de Productos</flux:heading>
         <flux:subheading>Características completas, costos, precios y rendimiento de ventas.</flux:subheading>
     </div>
-    <flux:button variant="primary" icon="plus" wire:click="crear">
-        Nuevo Producto
-    </flux:button>
+    <div class="flex gap-3">
+        <flux:button icon="arrow-up-tray" wire:click="importar">
+            Importar
+        </flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="crear">
+            Nuevo Producto
+        </flux:button>
+    </div>
 </div>

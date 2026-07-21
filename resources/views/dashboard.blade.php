@@ -1,4 +1,4 @@
-<x-layouts.app title="Panel de Control">
+<x-layouts.app.sidebar title="Panel de Control">
     <div class="space-y-8">
         {{-- Header --}}
         <div>
@@ -81,27 +81,27 @@
                 <flux:card class="space-y-4 h-full flex flex-col">
                     <flux:heading>Accesos Directos</flux:heading>
 
-                    <flux:button :href="route('ventas.index', ['crear' => 1])" variant="primary" class="w-full" icon="shopping-cart">
+                    <flux:button :href="route('ventas.index', ['crear' => 1])" wire:navigate variant="primary" class="w-full" icon="shopping-cart">
                         Registrar Venta
                     </flux:button>
 
                     <div class="grid grid-cols-2 gap-3 flex-1">
-                        <flux:button :href="route('productos.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="archive-box">
+                        <flux:button :href="route('productos.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="archive-box">
                             Productos
                         </flux:button>
-                        <flux:button :href="route('ventas.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="document-text">
+                        <flux:button :href="route('ventas.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="document-text">
                             Ventas
                         </flux:button>
-                        <flux:button :href="route('clientes.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="users">
+                        <flux:button :href="route('clientes.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="users">
                             Clientes
                         </flux:button>
-                        <flux:button :href="route('categorias.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="tag">
+                        <flux:button :href="route('categorias.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="tag">
                             Categorías
                         </flux:button>
-                        <flux:button :href="route('movimientos.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="arrows-up-down">
+                        <flux:button :href="route('movimientos.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="arrows-up-down">
                             Movimientos
                         </flux:button>
-                        <flux:button :href="route('reportes.index')" variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="presentation-chart-line">
+                        <flux:button :href="route('reportes.index')" wire:navigate variant="subtle" class="flex-col gap-2 h-auto py-4! text-center" icon="presentation-chart-line">
                             Reportes
                         </flux:button>
                     </div>
@@ -113,7 +113,7 @@
         <flux:card class="space-y-4">
             <div class="flex items-center justify-between">
                 <flux:heading>Últimos Movimientos</flux:heading>
-                <flux:button :href="route('ventas.index')" variant="ghost" size="sm">Ver todo</flux:button>
+                <flux:button :href="route('ventas.index')" wire:navigate variant="ghost" size="sm">Ver todo</flux:button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -268,4 +268,4 @@
 </script>
 @endpush
 
-</x-layouts.app>
+</x-layouts.app.sidebar>

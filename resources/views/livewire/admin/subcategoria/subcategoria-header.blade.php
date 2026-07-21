@@ -3,7 +3,12 @@
         <flux:heading size="xl">Subcategorías</flux:heading>
         <flux:subheading>Organiza divisiones más específicas dentro de cada categoría.</flux:subheading>
     </div>
-    <flux:button variant="primary" icon="plus" wire:click="crear">
-        Nueva Subcategoría
-    </flux:button>
+    <div class="flex gap-3">
+        <flux:button icon="arrow-up-tray" wire:click="importar">
+            Importar
+        </flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="crear">
+            Nueva Subcategoría
+        </flux:button>
+    </div>
 </div>

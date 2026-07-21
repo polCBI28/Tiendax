@@ -3,7 +3,12 @@
         <flux:heading size="xl">Clientes</flux:heading>
         <flux:subheading>Gestiona la información de contacto y el historial de tus clientes.</flux:subheading>
     </div>
-    <flux:button variant="primary" icon="plus" wire:click="crear">
-        Nuevo Cliente
-    </flux:button>
+    <div class="flex gap-3">
+        <flux:button icon="arrow-up-tray" wire:click="importar">
+            Importar
+        </flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="crear">
+            Nuevo Cliente
+        </flux:button>
+    </div>
 </div>

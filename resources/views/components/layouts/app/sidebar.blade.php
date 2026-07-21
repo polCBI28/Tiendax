@@ -8,10 +8,13 @@
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="mr-5 flex items-center gap-2" wire:navigate>
-                <span class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground font-bold text-sm">SY</span>
-                <span class="font-semibold text-sm">Sublimar Yamer</span>
-            </a>
+            <div class="flex items-center justify-between mr-5">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate>
+                    <span class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground font-bold text-sm">SY</span>
+                    <span class="font-semibold text-sm">Sublimar Yamer</span>
+                </a>
+                <livewire:notificaciones-widget />
+            </div>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="General" class="grid">
@@ -24,6 +27,13 @@
                     <flux:navlist.item icon="chart-bar" :href="route('ventas.detalle')" :current="request()->routeIs('ventas.detalle')" wire:navigate>Detalle Ventas</flux:navlist.item>
                     <flux:navlist.item icon="presentation-chart-line" :href="route('reportes.index')" :current="request()->routeIs('reportes.*')" wire:navigate>Reportes</flux:navlist.item>
                 </flux:navlist.group>
+
+                @role('Super Admin')
+                <flux:navlist.group heading="Administración" class="grid">
+                    <flux:navlist.item icon="users" :href="route('usuarios.index')" :current="request()->routeIs('usuarios.*')" wire:navigate>Usuarios</flux:navlist.item>
+                    <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.*')" wire:navigate>Roles</flux:navlist.item>
+                </flux:navlist.group>
+                @endrole
             </flux:navlist>
 
             <flux:spacer />
@@ -80,6 +90,8 @@
 
             <flux:spacer />
 
+            <livewire:notificaciones-widget />
+
             <flux:dropdown position="top" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
@@ -114,6 +126,7 @@
             {{ $slot }}
         </flux:main>
 
+        @stack('scripts')
         @fluxScripts
     </body>
 </html>

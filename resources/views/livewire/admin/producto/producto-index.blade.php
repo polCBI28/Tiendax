@@ -58,5 +58,6 @@
     <livewire:admin.producto.producto-header />
     <livewire:admin.producto.producto-table />
     <livewire:admin.producto.producto-form />
+    <livewire:admin.producto.producto-import />
 
 </div>

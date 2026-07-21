@@ -44,5 +44,6 @@
     <livewire:admin.cliente.cliente-header />
     <livewire:admin.cliente.cliente-table />
     <livewire:admin.cliente.cliente-form />
+    <livewire:admin.cliente.cliente-import />
 
 </div>

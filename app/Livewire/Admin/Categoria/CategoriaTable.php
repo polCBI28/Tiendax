@@ -2,12 +2,17 @@
 
 namespace App\Livewire\Admin\Categoria;
 
+use App\Exports\CategoriasExport;
 use App\Models\Categoria;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CategoriaTable extends Component
 {
@@ -81,7 +86,7 @@ class CategoriaTable extends Component
         $this->mensaje = 'Categoría guardada correctamente.';
     }
 
-    public function render(): View
+    protected function filteredQuery(): Builder
     {
         $query = Categoria::withCount('productos');
 
@@ -97,8 +102,30 @@ class CategoriaTable extends Component
             $query->orderBy($this->ordenar, $this->dir === 'desc' ? 'desc' : 'asc');
         }
 
+        return $query;
+    }
+
+    public function exportarExcel(): BinaryFileResponse
+    {
+        return (new CategoriasExport($this->filteredQuery()))
+            ->download('categorias-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportarPdf(): StreamedResponse
+    {
+        $categorias = $this->filteredQuery()->get();
+        $pdf = Pdf::loadView('exports.categorias-pdf', ['categorias' => $categorias]);
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'categorias-'.now()->format('Y-m-d').'.pdf'
+        );
+    }
+
+    public function render(): View
+    {
         return view('livewire.admin.categoria.categoria-table', [
-            'categorias' => $query->paginate(10),
+            'categorias' => $this->filteredQuery()->paginate(10),
         ]);
     }
 }
