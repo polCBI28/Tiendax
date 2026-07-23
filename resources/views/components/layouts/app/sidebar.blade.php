@@ -9,7 +9,7 @@
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
             <div class="flex items-center justify-between mr-5">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate>
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate.hover>
                     <span class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground font-bold text-sm">SY</span>
                     <span class="font-semibold text-sm">Sublimar Yamer</span>
                 </a>
@@ -18,20 +18,20 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="General" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Panel de Control</flux:navlist.item>
-                    <flux:navlist.item icon="tag" :href="route('categorias.index')" :current="request()->routeIs('categorias.*')" wire:navigate>Catálogo</flux:navlist.item>
-                    <flux:navlist.item icon="archive-box" :href="route('productos.index')" :current="request()->routeIs('productos.*')" wire:navigate>Inventario</flux:navlist.item>
-                    <flux:navlist.item icon="user-group" :href="route('clientes.index')" :current="request()->routeIs('clientes.*')" wire:navigate>Clientes</flux:navlist.item>
-                    <flux:navlist.item icon="arrow-trending-up" :href="route('movimientos.index')" :current="request()->routeIs('movimientos.*')" wire:navigate>Movimientos</flux:navlist.item>
-                    <flux:navlist.item icon="shopping-bag" :href="route('ventas.index')" :current="request()->routeIs('ventas.index') || request()->routeIs('ventas.show')" wire:navigate>Ventas</flux:navlist.item>
-                    <flux:navlist.item icon="chart-bar" :href="route('ventas.detalle')" :current="request()->routeIs('ventas.detalle')" wire:navigate>Detalle Ventas</flux:navlist.item>
-                    <flux:navlist.item icon="presentation-chart-line" :href="route('reportes.index')" :current="request()->routeIs('reportes.*')" wire:navigate>Reportes</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate.hover>Panel de Control</flux:navlist.item>
+                    <flux:navlist.item icon="tag" :href="route('categorias.index')" :current="request()->routeIs('categorias.*')" wire:navigate.hover>Catálogo</flux:navlist.item>
+                    <flux:navlist.item icon="archive-box" :href="route('productos.index')" :current="request()->routeIs('productos.*')" wire:navigate.hover>Inventario</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" :href="route('clientes.index')" :current="request()->routeIs('clientes.*')" wire:navigate.hover>Clientes</flux:navlist.item>
+                    <flux:navlist.item icon="arrow-trending-up" :href="route('movimientos.index')" :current="request()->routeIs('movimientos.*')" wire:navigate.hover>Movimientos</flux:navlist.item>
+                    <flux:navlist.item icon="shopping-bag" :href="route('ventas.index')" :current="request()->routeIs('ventas.index') || request()->routeIs('ventas.show')" wire:navigate.hover>Ventas</flux:navlist.item>
+                    <flux:navlist.item icon="chart-bar" :href="route('ventas.detalle')" :current="request()->routeIs('ventas.detalle')" wire:navigate.hover>Detalle Ventas</flux:navlist.item>
+                    <flux:navlist.item icon="presentation-chart-line" :href="route('reportes.index')" :current="request()->routeIs('reportes.*')" wire:navigate.hover>Reportes</flux:navlist.item>
                 </flux:navlist.group>
 
                 @role('Super Admin')
                 <flux:navlist.group heading="Administración" class="grid">
-                    <flux:navlist.item icon="users" :href="route('usuarios.index')" :current="request()->routeIs('usuarios.*')" wire:navigate>Usuarios</flux:navlist.item>
-                    <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.*')" wire:navigate>Roles</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('usuarios.index')" :current="request()->routeIs('usuarios.*')" wire:navigate.hover>Usuarios</flux:navlist.item>
+                    <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.*')" wire:navigate.hover>Roles</flux:navlist.item>
                 </flux:navlist.group>
                 @endrole
             </flux:navlist>
@@ -69,7 +69,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Configuración</flux:menu.item>
+                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate.hover>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -100,7 +100,7 @@
 
                 <flux:menu>
                     <flux:menu.radio.group>
-                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Configuración</flux:menu.item>
+                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate.hover>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
