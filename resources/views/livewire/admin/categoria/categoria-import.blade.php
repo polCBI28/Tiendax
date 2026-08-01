@@ -15,10 +15,6 @@
                 @error('archivo') <flux:text size="sm" class="text-red-600 dark:text-red-400 mt-1">{{ $message }}</flux:text> @enderror
             </div>
 
-            @if($creados !== null)
-                <flux:callout icon="check-circle" variant="success"
-                    heading="Importación completada: {{ $creados }} creados, {{ $actualizados }} actualizados." />
-            @endif
 
             @if(count($errores) > 0)
                 <div class="max-h-40 overflow-y-auto space-y-1 border border-red-200 dark:border-red-900/30 rounded-lg p-3 bg-red-50 dark:bg-red-900/10">

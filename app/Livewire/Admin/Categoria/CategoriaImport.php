@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Categoria;
 use App\Exports\CategoriasExport;
 use App\Imports\CategoriasImport as CategoriasImportClass;
 use App\Models\Categoria;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -42,6 +43,8 @@ class CategoriaImport extends Component
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('categorias.crear'), 403);
+
         $this->validate(['archivo' => 'required|file|mimes:xlsx,csv,xls']);
 
         $import = new CategoriasImportClass;
@@ -54,6 +57,7 @@ class CategoriaImport extends Component
             ->all();
 
         if ($this->creados > 0 || $this->actualizados > 0) {
+            Flux::toast(text: "Importación completada: {$this->creados} creados, {$this->actualizados} actualizados.", variant: 'success');
             $this->dispatch('categoria-guardada');
         }
 

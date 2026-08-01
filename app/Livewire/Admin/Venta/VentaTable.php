@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Venta;
 
 use App\Models\Venta;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
@@ -25,8 +26,6 @@ class VentaTable extends Component
     #[Url]
     public string $hasta = '';
 
-    public ?string $mensaje = null;
-
     public function updating(string $property): void
     {
         if (in_array($property, ['estado', 'desde', 'hasta'])) {
@@ -42,28 +41,34 @@ class VentaTable extends Component
 
     public function cambiarEstado(int $ventaId, string $nuevoEstado): void
     {
+        abort_unless(auth()->user()->can('ventas.editar'), 403);
+
         if (! in_array($nuevoEstado, ['borrador', 'pendiente', 'completado', 'cancelado'])) {
             return;
         }
 
         Venta::findOrFail($ventaId)->update(['estado' => $nuevoEstado]);
 
-        $this->mensaje = 'Estado de la venta actualizado.';
+        Flux::toast(text: 'Estado de la venta actualizado.', variant: 'success');
     }
 
     public function completarPago(int $ventaId): void
     {
+        abort_unless(auth()->user()->can('ventas.editar'), 403);
+
         $venta = Venta::findOrFail($ventaId);
         $venta->update(['adelanto' => $venta->total, 'estado' => 'completado']);
 
-        $this->mensaje = 'Pago completado correctamente.';
+        Flux::toast(text: 'Pago completado correctamente.', variant: 'success');
     }
 
     public function eliminar(int $ventaId): void
     {
+        abort_unless(auth()->user()->can('ventas.eliminar'), 403);
+
         Venta::findOrFail($ventaId)->delete();
 
-        $this->mensaje = 'Venta eliminada correctamente.';
+        Flux::toast(text: 'Venta eliminada correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('venta-eliminada');
     }
@@ -71,7 +76,7 @@ class VentaTable extends Component
     #[On('venta-guardada')]
     public function ventaGuardada(): void
     {
-        $this->mensaje = 'Venta registrada correctamente.';
+        Flux::toast(text: 'Venta registrada correctamente.', variant: 'success');
     }
 
     protected function filteredQuery(): Builder
@@ -93,6 +98,8 @@ class VentaTable extends Component
 
     public function exportarPdf(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('ventas.ver'), 403);
+
         $ventas = $this->filteredQuery()->get();
 
         $pdf = Pdf::loadView('exports.ventas-pdf', [

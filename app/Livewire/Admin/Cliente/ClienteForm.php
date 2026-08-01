@@ -58,6 +58,8 @@ class ClienteForm extends Component
 
     public function guardar(): void
     {
+        abort_unless(auth()->user()->can($this->clienteId ? 'clientes.editar' : 'clientes.crear'), 403);
+
         $validated = $this->validate();
 
         if ($this->clienteId) {

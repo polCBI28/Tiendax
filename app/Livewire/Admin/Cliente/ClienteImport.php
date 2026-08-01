@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Cliente;
 use App\Exports\ClientesExport;
 use App\Imports\ClientesImport as ClientesImportClass;
 use App\Models\Cliente;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -42,6 +43,8 @@ class ClienteImport extends Component
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('clientes.crear'), 403);
+
         $this->validate(['archivo' => 'required|file|mimes:xlsx,csv,xls']);
 
         $import = new ClientesImportClass;
@@ -54,6 +57,7 @@ class ClienteImport extends Component
             ->all();
 
         if ($this->creados > 0 || $this->actualizados > 0) {
+            Flux::toast(text: "Importación completada: {$this->creados} creados, {$this->actualizados} actualizados.", variant: 'success');
             $this->dispatch('cliente-guardado');
         }
 

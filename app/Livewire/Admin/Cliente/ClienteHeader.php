@@ -9,11 +9,15 @@ class ClienteHeader extends Component
 {
     public function crear(): void
     {
+        abort_unless(auth()->user()->can('clientes.crear'), 403);
+
         $this->dispatch('abrir-formulario-cliente');
     }
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('clientes.crear'), 403);
+
         $this->dispatch('abrir-importar-cliente');
     }
 

@@ -5,10 +5,14 @@ use App\Models\Movimiento;
 use App\Models\Producto;
 use App\Models\User;
 use App\Models\Venta;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->seed(RolesAndPermissionsSeeder::class);
+    $usuario = User::factory()->create();
+    $usuario->assignRole('Super Admin');
+    $this->actingAs($usuario);
 });
 
 test('la página de movimientos carga correctamente', function () {

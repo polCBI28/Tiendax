@@ -7,6 +7,7 @@ use App\Models\DetalleVenta;
 use App\Models\Movimiento;
 use App\Models\Producto;
 use App\Models\Venta;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -192,8 +193,10 @@ class VentaForm extends Component
 
     public function guardar(string $estadoDeseado): void
     {
+        abort_unless(auth()->user()->can('ventas.crear'), 403);
+
         if (empty($this->carrito)) {
-            $this->addError('carrito', 'Agrega al menos un producto al carrito.');
+            Flux::toast(text: 'Agrega al menos un producto al carrito.', variant: 'danger');
 
             return;
         }

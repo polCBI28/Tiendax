@@ -96,6 +96,8 @@ class ProductoForm extends Component
 
     public function guardar(): void
     {
+        abort_unless(auth()->user()->can($this->productoId ? 'productos.editar' : 'productos.crear'), 403);
+
         $validated = $this->validate();
 
         $data = [

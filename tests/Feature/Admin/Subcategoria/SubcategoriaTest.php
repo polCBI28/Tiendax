@@ -5,10 +5,14 @@ use App\Livewire\Admin\Subcategoria\SubcategoriaTable;
 use App\Models\Categoria;
 use App\Models\Subcategoria;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->seed(RolesAndPermissionsSeeder::class);
+    $usuario = User::factory()->create();
+    $usuario->assignRole('Super Admin');
+    $this->actingAs($usuario);
 });
 
 test('la página de subcategorías carga correctamente', function () {

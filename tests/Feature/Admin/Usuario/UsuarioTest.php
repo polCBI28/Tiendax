@@ -77,7 +77,7 @@ test('editar un usuario existente actualiza sus datos sin exigir contraseña', f
 test('un usuario no puede eliminarse a sí mismo', function () {
     Livewire::test(UsuarioTable::class)
         ->call('eliminar', $this->superAdmin->id)
-        ->assertHasErrors('self');
+        ->assertDispatched('toast-show');
 
     expect(User::find($this->superAdmin->id))->not->toBeNull();
 });

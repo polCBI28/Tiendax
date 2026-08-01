@@ -1,8 +1,8 @@
 <?php
 
 use App\Livewire\Actions\Logout;
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -20,7 +20,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         Auth::user()->sendEmailVerificationNotification();
 
-        Session::flash('status', 'verification-link-sent');
+        Flux::toast(text: 'Se envió un nuevo enlace de verificación a tu correo.', variant: 'success');
     }
 
     /**
@@ -38,12 +38,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <div class="text-center text-sm text-gray-600 dark:text-zinc-400">
         {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
     </div>
-
-    @if (session('status') == 'verification-link-sent')
-        <div class="font-medium text-center text-sm text-green-600 dark:text-green-400">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
-    @endif
 
     <div class="flex flex-col items-center justify-between space-y-3">
         <flux:button wire:click="sendVerification" variant="primary" class="w-full">

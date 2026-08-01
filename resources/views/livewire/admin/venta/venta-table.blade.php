@@ -1,9 +1,5 @@
 <div>
 
-    @if($mensaje)
-        <flux:callout icon="check-circle" variant="success" heading="{{ $mensaje }}" class="mb-6" />
-    @endif
-
     <flux:card class="overflow-hidden p-0">
         {{-- Toolbar --}}
         <div class="flex flex-wrap items-center gap-3 p-4 border-b border-zinc-200 dark:border-white/10">
@@ -24,9 +20,11 @@
                 <span class="text-sm text-zinc-400 whitespace-nowrap">
                     {{ $ventas->total() }} venta{{ $ventas->total() === 1 ? '' : 's' }}
                 </span>
+                @can('ventas.ver')
                 <flux:button wire:click="exportarPdf" variant="primary" size="sm" icon="document-arrow-down">
                     Generar PDF
                 </flux:button>
+                @endcan
             </div>
         </div>
 
@@ -91,6 +89,7 @@
                                     </svg>
                                 </a>
 
+                                @can('ventas.editar')
                                 <flux:dropdown position="bottom" align="end">
                                     <button class="p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300" title="Cambiar estado">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -117,7 +116,9 @@
                                         </svg>
                                     </button>
                                 @endif
+                                @endcan
 
+                                @can('ventas.eliminar')
                                 <button wire:click="eliminar({{ $venta->id }})"
                                         wire:confirm="¿Eliminar esta venta? Esta acción no se puede deshacer."
                                         class="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
@@ -126,6 +127,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
+                                @endcan
                             </div>
                         </td>
                     </tr>

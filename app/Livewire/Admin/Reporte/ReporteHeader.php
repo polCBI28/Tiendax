@@ -37,6 +37,8 @@ class ReporteHeader extends Component
 
     public function generarPdf(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('reportes.ver'), 403);
+
         $ventas = Venta::whereDate('fecha_venta', '>=', $this->desde)
             ->whereDate('fecha_venta', '<=', $this->hasta)
             ->get();
@@ -73,6 +75,8 @@ class ReporteHeader extends Component
 
     public function exportarCsv(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('reportes.ver'), 403);
+
         $ventas = Venta::with('cliente')
             ->whereMonth('fecha_venta', now()->month)
             ->whereYear('fecha_venta', now()->year)

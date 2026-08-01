@@ -3,7 +3,9 @@
         <flux:heading size="xl">Ventas</flux:heading>
         <flux:subheading>Registra y consulta las ventas del negocio.</flux:subheading>
     </div>
+    @can('ventas.crear')
     <flux:button variant="primary" icon="plus" wire:click="crear">
         Nueva Venta
     </flux:button>
+    @endcan
 </div>

@@ -9,11 +9,15 @@ class SubcategoriaHeader extends Component
 {
     public function crear(): void
     {
+        abort_unless(auth()->user()->can('categorias.crear'), 403);
+
         $this->dispatch('abrir-formulario-subcategoria');
     }
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('categorias.crear'), 403);
+
         $this->dispatch('abrir-importar-subcategoria');
     }
 

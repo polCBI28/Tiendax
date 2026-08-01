@@ -1,9 +1,5 @@
 <div>
 
-    @if($mensaje)
-        <flux:callout icon="check-circle" variant="success" heading="{{ $mensaje }}" class="mb-6" />
-    @endif
-
     <flux:card class="overflow-hidden p-0">
         {{-- Tabla --}}
         <div wire:loading.class="opacity-60" class="overflow-x-auto">

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Usuario;
 
 use App\Models\User;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -19,8 +20,6 @@ class UsuarioTable extends Component
 
     #[Url(as: 'rol')]
     public string $rolFiltro = '';
-
-    public ?string $mensaje = null;
 
     public function updating(string $property): void
     {
@@ -43,15 +42,14 @@ class UsuarioTable extends Component
     public function eliminar(int $usuarioId): void
     {
         if ($usuarioId === auth()->id()) {
-            $this->mensaje = null;
-            $this->addError('self', 'No puedes eliminar tu propio usuario.');
+            Flux::toast(text: 'No puedes eliminar tu propio usuario.', variant: 'danger');
 
             return;
         }
 
         User::findOrFail($usuarioId)->delete();
 
-        $this->mensaje = 'Usuario eliminado correctamente.';
+        Flux::toast(text: 'Usuario eliminado correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('usuario-eliminado');
     }
@@ -59,7 +57,7 @@ class UsuarioTable extends Component
     #[On('usuario-guardado')]
     public function usuarioGuardado(): void
     {
-        $this->mensaje = 'Usuario guardado correctamente.';
+        Flux::toast(text: 'Usuario guardado correctamente.', variant: 'success');
     }
 
     public function render(): View

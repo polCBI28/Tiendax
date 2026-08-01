@@ -1,12 +1,5 @@
 <div>
 
-    @if($mensaje)
-        <flux:callout icon="check-circle" variant="success" heading="{{ $mensaje }}" class="mb-6" />
-    @endif
-    @error('protegido')
-        <flux:callout icon="exclamation-triangle" variant="danger" heading="{{ $message }}" class="mb-6" />
-    @enderror
-
     <flux:card class="overflow-hidden p-0">
         {{-- Toolbar --}}
         <div class="flex flex-wrap items-center gap-3 p-4 border-b border-zinc-200 dark:border-white/10">

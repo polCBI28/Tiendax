@@ -9,6 +9,8 @@ class VentaHeader extends Component
 {
     public function crear(): void
     {
+        abort_unless(auth()->user()->can('ventas.crear'), 403);
+
         $this->dispatch('abrir-formulario-venta');
     }
 

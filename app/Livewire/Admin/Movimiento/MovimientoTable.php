@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Movimiento;
 use App\Models\DetalleVenta;
 use App\Models\Movimiento;
 use App\Models\Venta;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
@@ -15,12 +16,10 @@ class MovimientoTable extends Component
 {
     use WithPagination;
 
-    public ?string $mensaje = null;
-
     #[On('movimiento-guardado')]
     public function movimientoGuardado(): void
     {
-        $this->mensaje = 'Movimiento registrado. Stock actualizado.';
+        Flux::toast(text: 'Movimiento registrado. Stock actualizado.', variant: 'success');
     }
 
     public function render(): View

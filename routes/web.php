@@ -64,32 +64,46 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/buscar', BuscarIndex::class)->name('buscar');
 
     // Catálogo
-    Route::get('/categorias', CategoriaIndex::class)->name('categorias.index');
-    Route::get('/categorias/{categoria}', CategoriaShow::class)->name('categorias.show');
-    Route::get('/subcategorias', SubcategoriaIndex::class)->name('subcategorias.index');
-    Route::get('/subcategorias/{subcategoria}', SubcategoriaShow::class)->name('subcategorias.show');
+    Route::middleware(['permission:categorias.ver'])->group(function () {
+        Route::get('/categorias', CategoriaIndex::class)->name('categorias.index');
+        Route::get('/categorias/{categoria}', CategoriaShow::class)->name('categorias.show');
+        Route::get('/subcategorias', SubcategoriaIndex::class)->name('subcategorias.index');
+        Route::get('/subcategorias/{subcategoria}', SubcategoriaShow::class)->name('subcategorias.show');
+    });
 
     // Inventario
-    Route::get('/productos', ProductoIndex::class)->name('productos.index');
-    Route::get('/productos/{producto}', ProductoShow::class)->name('productos.show');
-    Route::get('/movimientos', MovimientoIndex::class)->name('movimientos.index');
-    Route::get('/movimientos/{fecha}', MovimientoShow::class)->name('movimientos.show');
+    Route::middleware(['permission:productos.ver'])->group(function () {
+        Route::get('/productos', ProductoIndex::class)->name('productos.index');
+        Route::get('/productos/{producto}', ProductoShow::class)->name('productos.show');
+    });
+    Route::middleware(['permission:movimientos.ver'])->group(function () {
+        Route::get('/movimientos', MovimientoIndex::class)->name('movimientos.index');
+        Route::get('/movimientos/{fecha}', MovimientoShow::class)->name('movimientos.show');
+    });
 
     // Ventas
-    Route::get('/ventas/detalle', VentaDetalleIndex::class)->name('ventas.detalle');
-    Route::get('/clientes', ClienteIndex::class)->name('clientes.index');
-    Route::get('/clientes/{cliente}', ClienteShow::class)->name('clientes.show');
-    Route::get('/ventas', VentaIndex::class)->name('ventas.index');
-    Route::get('/ventas/{venta}', VentaShow::class)->name('ventas.show');
-    Route::get('/detalle-ventas', DetalleVentaIndex::class)->name('detalle-ventas.index');
+    Route::middleware(['permission:ventas.ver'])->group(function () {
+        Route::get('/ventas/detalle', VentaDetalleIndex::class)->name('ventas.detalle');
+        Route::get('/ventas', VentaIndex::class)->name('ventas.index');
+        Route::get('/ventas/{venta}', VentaShow::class)->name('ventas.show');
+        Route::get('/detalle-ventas', DetalleVentaIndex::class)->name('detalle-ventas.index');
+    });
+
+    Route::middleware(['permission:clientes.ver'])->group(function () {
+        Route::get('/clientes', ClienteIndex::class)->name('clientes.index');
+        Route::get('/clientes/{cliente}', ClienteShow::class)->name('clientes.show');
+    });
 
     // Reportes
-    Route::get('/reportes', ReporteIndex::class)->name('reportes.index');
+    Route::middleware(['permission:reportes.ver'])->group(function () {
+        Route::get('/reportes', ReporteIndex::class)->name('reportes.index');
+    });
 
     // Administración (solo Super Admin)
     Route::middleware(['role:Super Admin'])->group(function () {
         Route::get('/usuarios', UsuarioIndex::class)->name('usuarios.index');
         Route::get('/roles', RolIndex::class)->name('roles.index');
+        Volt::route('/settings/logo', 'settings.logo')->name('settings.logo');
     });
 
     // Settings

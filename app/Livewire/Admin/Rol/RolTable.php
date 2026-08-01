@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Rol;
 
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -15,8 +16,6 @@ class RolTable extends Component
 
     #[Url(as: 'q')]
     public string $search = '';
-
-    public ?string $mensaje = null;
 
     public function updatingSearch(): void
     {
@@ -33,14 +32,14 @@ class RolTable extends Component
         $rol = Role::findOrFail($rolId);
 
         if ($rol->name === 'Super Admin') {
-            $this->addError('protegido', 'El rol "Super Admin" no se puede eliminar.');
+            Flux::toast(text: 'El rol "Super Admin" no se puede eliminar.', variant: 'danger');
 
             return;
         }
 
         $rol->delete();
 
-        $this->mensaje = 'Rol eliminado correctamente.';
+        Flux::toast(text: 'Rol eliminado correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('rol-eliminado');
     }
@@ -48,7 +47,7 @@ class RolTable extends Component
     #[On('rol-guardado')]
     public function rolGuardado(): void
     {
-        $this->mensaje = 'Rol guardado correctamente.';
+        Flux::toast(text: 'Rol guardado correctamente.', variant: 'success');
     }
 
     public function render(): View

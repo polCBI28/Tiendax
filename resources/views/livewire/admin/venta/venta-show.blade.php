@@ -110,6 +110,7 @@
                 </div>
             </flux:card>
 
+            @can('ventas.editar')
             @if($deuda > 0 && $venta->estado === 'pendiente')
                 <flux:button
                     wire:click="completarPago"
@@ -119,6 +120,7 @@
                     Completar Pago (S/ {{ number_format($deuda, 2) }})
                 </flux:button>
             @endif
+            @endcan
 
             <flux:button href="{{ route('ventas.index') }}" wire:navigate icon="arrow-left" class="w-full justify-center">
                 Volver a Ventas

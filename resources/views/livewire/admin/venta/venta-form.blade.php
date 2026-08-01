@@ -15,8 +15,6 @@
             </div>
         </div>
 
-        @error('carrito') <flux:callout icon="exclamation-triangle" variant="danger" heading="{{ $message }}" class="mb-4" /> @enderror
-
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
             {{-- Panel izquierdo: datos + búsqueda de productos --}}

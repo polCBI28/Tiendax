@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\DetalleVenta;
 
 use App\Models\DetalleVenta;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -16,8 +17,6 @@ class DetalleVentaTable extends Component
     #[Url(as: 'q')]
     public string $search = '';
 
-    public ?string $mensaje = null;
-
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -25,14 +24,18 @@ class DetalleVentaTable extends Component
 
     public function editar(int $detalleVentaId): void
     {
+        abort_unless(auth()->user()->can('ventas.editar'), 403);
+
         $this->dispatch('abrir-formulario-detalle-venta', detalleVentaId: $detalleVentaId);
     }
 
     public function eliminar(int $detalleVentaId): void
     {
+        abort_unless(auth()->user()->can('ventas.eliminar'), 403);
+
         DetalleVenta::findOrFail($detalleVentaId)->delete();
 
-        $this->mensaje = 'Línea eliminada correctamente.';
+        Flux::toast(text: 'Línea eliminada correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('detalle-venta-eliminado');
     }
@@ -40,7 +43,7 @@ class DetalleVentaTable extends Component
     #[On('detalle-venta-guardado')]
     public function detalleVentaGuardado(): void
     {
-        $this->mensaje = 'Línea guardada correctamente.';
+        Flux::toast(text: 'Línea guardada correctamente.', variant: 'success');
     }
 
     public function render(): View

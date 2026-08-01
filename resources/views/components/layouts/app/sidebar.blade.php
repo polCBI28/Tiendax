@@ -10,7 +10,7 @@
 
             <div class="flex items-center justify-between mr-5">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate.hover>
-                    <span class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground font-bold text-sm">SY</span>
+                    <x-brand-logo size="sm" />
                     <span class="font-semibold text-sm">Sublimar Yamer</span>
                 </a>
                 <livewire:notificaciones-widget />
@@ -19,13 +19,25 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="General" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate.hover>Panel de Control</flux:navlist.item>
+                    @can('categorias.ver')
                     <flux:navlist.item icon="tag" :href="route('categorias.index')" :current="request()->routeIs('categorias.*')" wire:navigate.hover>Catálogo</flux:navlist.item>
+                    @endcan
+                    @can('productos.ver')
                     <flux:navlist.item icon="archive-box" :href="route('productos.index')" :current="request()->routeIs('productos.*')" wire:navigate.hover>Inventario</flux:navlist.item>
+                    @endcan
+                    @can('clientes.ver')
                     <flux:navlist.item icon="user-group" :href="route('clientes.index')" :current="request()->routeIs('clientes.*')" wire:navigate.hover>Clientes</flux:navlist.item>
+                    @endcan
+                    @can('movimientos.ver')
                     <flux:navlist.item icon="arrow-trending-up" :href="route('movimientos.index')" :current="request()->routeIs('movimientos.*')" wire:navigate.hover>Movimientos</flux:navlist.item>
+                    @endcan
+                    @can('ventas.ver')
                     <flux:navlist.item icon="shopping-bag" :href="route('ventas.index')" :current="request()->routeIs('ventas.index') || request()->routeIs('ventas.show')" wire:navigate.hover>Ventas</flux:navlist.item>
                     <flux:navlist.item icon="chart-bar" :href="route('ventas.detalle')" :current="request()->routeIs('ventas.detalle')" wire:navigate.hover>Detalle Ventas</flux:navlist.item>
+                    @endcan
+                    @can('reportes.ver')
                     <flux:navlist.item icon="presentation-chart-line" :href="route('reportes.index')" :current="request()->routeIs('reportes.*')" wire:navigate.hover>Reportes</flux:navlist.item>
+                    @endcan
                 </flux:navlist.group>
 
                 @role('Super Admin')
@@ -116,15 +128,10 @@
         </flux:header>
 
         <flux:main>
-            @if(session('success'))
-                <flux:callout icon="check-circle" variant="success" heading="{{ session('success') }}" class="mb-6" />
-            @endif
-            @if(session('error'))
-                <flux:callout icon="exclamation-triangle" variant="danger" heading="{{ session('error') }}" class="mb-6" />
-            @endif
-
             {{ $slot }}
         </flux:main>
+
+        <flux:toast />
 
         @stack('scripts')
         @fluxScripts

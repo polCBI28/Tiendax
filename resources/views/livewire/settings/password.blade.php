@@ -1,5 +1,6 @@
 <?php
 
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -34,7 +35,7 @@ new #[Layout('components.layouts.app.sidebar', ['title' => 'Contraseña'])] clas
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
-        $this->dispatch('password-updated');
+        Flux::toast(text: 'Contraseña actualizada correctamente.', variant: 'success');
     }
 }; ?>
 
@@ -72,13 +73,7 @@ new #[Layout('components.layouts.app.sidebar', ['title' => 'Contraseña'])] clas
             />
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
-                </div>
-
-                <x-action-message class="me-3" on="password-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
+                <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>
             </div>
         </form>
     </x-settings.layout>

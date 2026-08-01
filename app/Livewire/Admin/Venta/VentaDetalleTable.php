@@ -106,12 +106,16 @@ class VentaDetalleTable extends Component
 
     public function exportarExcel(): BinaryFileResponse
     {
+        abort_unless(auth()->user()->can('ventas.ver'), 403);
+
         return (new VentasDetalleExport($this->queryFiltrado()))
             ->download('ventas-detalle-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function exportarPdf(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('ventas.ver'), 403);
+
         $ventas = $this->queryFiltrado()->get();
 
         $pdf = Pdf::loadView('exports.ventas-detalle-pdf', [

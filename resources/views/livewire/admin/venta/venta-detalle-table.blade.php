@@ -69,6 +69,7 @@
                 @if($search !== '' || $desde !== '' || $hasta !== '' || $clienteId !== '' || $estado !== '' || $descuento !== '')
                     <flux:button variant="ghost" size="sm" icon="x-mark" wire:click="limpiarFiltros">Limpiar</flux:button>
                 @endif
+                @can('ventas.ver')
                 <flux:dropdown position="bottom" align="end">
                     <flux:button variant="primary" size="sm" icon="arrow-down-tray">Exportar</flux:button>
                     <flux:menu>
@@ -76,6 +77,7 @@
                         <flux:menu.item wire:click="exportarPdf" icon="document-arrow-down">PDF</flux:menu.item>
                     </flux:menu>
                 </flux:dropdown>
+                @endcan
             </div>
         </div>
 

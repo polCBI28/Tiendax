@@ -40,10 +40,17 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::where('name', 'like', '%.ver')->get()
         );
 
-        $primerUsuario = User::orderBy('id')->first();
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Administrador',
+                'password' => bcrypt('987654321'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        if ($primerUsuario && ! $primerUsuario->hasRole('Super Admin')) {
-            $primerUsuario->assignRole($superAdmin);
+        if (! $admin->hasRole('Super Admin')) {
+            $admin->assignRole($superAdmin);
         }
     }
 }

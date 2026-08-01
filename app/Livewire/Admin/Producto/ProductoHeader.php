@@ -9,11 +9,15 @@ class ProductoHeader extends Component
 {
     public function crear(): void
     {
+        abort_unless(auth()->user()->can('productos.crear'), 403);
+
         $this->dispatch('abrir-formulario-producto');
     }
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('productos.crear'), 403);
+
         $this->dispatch('abrir-importar-producto');
     }
 

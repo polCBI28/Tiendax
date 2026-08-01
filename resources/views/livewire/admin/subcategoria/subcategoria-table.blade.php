@@ -1,9 +1,5 @@
 <div>
 
-    @if($mensaje)
-        <flux:callout icon="check-circle" variant="success" heading="{{ $mensaje }}" class="mb-6" />
-    @endif
-
     <flux:card class="overflow-hidden p-0">
         {{-- Toolbar --}}
         <div class="flex flex-wrap items-center gap-3 p-4 border-b border-zinc-200 dark:border-white/10">
@@ -33,6 +29,7 @@
                 <span class="text-sm text-zinc-400 whitespace-nowrap">
                     {{ $subcategorias->total() }} subcategoría{{ $subcategorias->total() === 1 ? '' : 's' }}
                 </span>
+                @can('categorias.ver')
                 <flux:dropdown position="bottom" align="end">
                     <flux:button variant="primary" size="sm" icon="arrow-down-tray">Exportar</flux:button>
                     <flux:menu>
@@ -40,6 +37,7 @@
                         <flux:menu.item wire:click="exportarPdf" icon="document-arrow-down">PDF</flux:menu.item>
                     </flux:menu>
                 </flux:dropdown>
+                @endcan
             </div>
         </div>
 
@@ -100,6 +98,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
+                                @can('categorias.editar')
                                 <button wire:click="editar({{ $sub->id }})"
                                         class="p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                                         title="Editar">
@@ -107,6 +106,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
+                                @endcan
+                                @can('categorias.eliminar')
                                 <button wire:click="eliminar({{ $sub->id }})"
                                         wire:confirm="¿Eliminar esta subcategoría? Esta acción no se puede deshacer."
                                         class="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
@@ -115,6 +116,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
+                                @endcan
                             </div>
                         </td>
                     </tr>

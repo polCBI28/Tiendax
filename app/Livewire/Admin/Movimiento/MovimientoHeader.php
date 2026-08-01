@@ -9,6 +9,8 @@ class MovimientoHeader extends Component
 {
     public function crear(): void
     {
+        abort_unless(auth()->user()->can('movimientos.crear'), 403);
+
         $this->dispatch('abrir-formulario-movimiento');
     }
 

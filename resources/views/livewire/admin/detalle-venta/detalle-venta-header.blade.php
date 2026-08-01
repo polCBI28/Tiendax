@@ -3,7 +3,9 @@
         <flux:heading size="xl">Detalle de Ventas</flux:heading>
         <flux:subheading>Líneas individuales de productos vendidos.</flux:subheading>
     </div>
+    @can('ventas.crear')
     <flux:button variant="primary" icon="plus" wire:click="crear">
         Nueva Línea
     </flux:button>
+    @endcan
 </div>

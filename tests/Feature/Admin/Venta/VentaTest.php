@@ -6,10 +6,14 @@ use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\User;
 use App\Models\Venta;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->seed(RolesAndPermissionsSeeder::class);
+    $usuario = User::factory()->create();
+    $usuario->assignRole('Super Admin');
+    $this->actingAs($usuario);
 });
 
 test('la página de ventas carga correctamente', function () {
@@ -88,7 +92,7 @@ test('no se puede guardar una venta sin productos en el carrito', function () {
     Livewire::test(VentaForm::class)
         ->call('abrir')
         ->call('guardar', 'completado')
-        ->assertHasErrors(['carrito']);
+        ->assertDispatched('toast-show');
 
     expect(Venta::count())->toBe(0);
 });

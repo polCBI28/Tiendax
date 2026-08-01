@@ -6,6 +6,7 @@ use App\Exports\SubcategoriasExport;
 use App\Models\Categoria;
 use App\Models\Subcategoria;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
@@ -30,8 +31,6 @@ class SubcategoriaTable extends Component
 
     #[Url]
     public string $dir = 'asc';
-
-    public ?string $mensaje = null;
 
     /** @var array<int, string> */
     protected array $columnasOrdenables = ['nombre', 'created_at'];
@@ -69,14 +68,18 @@ class SubcategoriaTable extends Component
 
     public function editar(int $subcategoriaId): void
     {
+        abort_unless(auth()->user()->can('categorias.editar'), 403);
+
         $this->dispatch('abrir-formulario-subcategoria', subcategoriaId: $subcategoriaId);
     }
 
     public function eliminar(int $subcategoriaId): void
     {
+        abort_unless(auth()->user()->can('categorias.eliminar'), 403);
+
         Subcategoria::findOrFail($subcategoriaId)->delete();
 
-        $this->mensaje = 'Subcategoría eliminada correctamente.';
+        Flux::toast(text: 'Subcategoría eliminada correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('subcategoria-eliminada');
     }
@@ -84,7 +87,7 @@ class SubcategoriaTable extends Component
     #[On('subcategoria-guardada')]
     public function subcategoriaGuardada(): void
     {
-        $this->mensaje = 'Subcategoría guardada correctamente.';
+        Flux::toast(text: 'Subcategoría guardada correctamente.', variant: 'success');
     }
 
     protected function filteredQuery(): Builder
@@ -108,12 +111,16 @@ class SubcategoriaTable extends Component
 
     public function exportarExcel(): BinaryFileResponse
     {
+        abort_unless(auth()->user()->can('categorias.ver'), 403);
+
         return (new SubcategoriasExport($this->filteredQuery()))
             ->download('subcategorias-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function exportarPdf(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('categorias.ver'), 403);
+
         $subcategorias = $this->filteredQuery()->get();
         $pdf = Pdf::loadView('exports.subcategorias-pdf', ['subcategorias' => $subcategorias]);
 

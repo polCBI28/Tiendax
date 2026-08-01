@@ -101,6 +101,8 @@ class MovimientoForm extends Component
 
     public function guardar(): void
     {
+        abort_unless(auth()->user()->can('movimientos.crear'), 403);
+
         $validated = $this->validate();
 
         $producto = Producto::findOrFail($validated['productoId']);

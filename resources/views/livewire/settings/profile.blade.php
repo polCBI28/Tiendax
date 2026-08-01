@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -48,7 +48,7 @@ new #[Layout('components.layouts.app.sidebar', ['title' => 'Perfil'])] class ext
 
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        Flux::toast(text: 'Perfil actualizado correctamente.', variant: 'success');
     }
 
     /**
@@ -66,7 +66,7 @@ new #[Layout('components.layouts.app.sidebar', ['title' => 'Perfil'])] class ext
 
         $user->sendEmailVerificationNotification();
 
-        Session::flash('status', 'verification-link-sent');
+        Flux::toast(text: 'Se envió un nuevo enlace de verificación a tu correo.', variant: 'success');
     }
 }; ?>
 
@@ -92,24 +92,12 @@ new #[Layout('components.layouts.app.sidebar', ['title' => 'Perfil'])] class ext
                                 {{ __('Click here to re-send the verification email.') }}
                             </button>
                         </p>
-
-                        @if (session('status') === 'verification-link-sent')
-                            <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                                {{ __('A new verification link has been sent to your email address.') }}
-                            </p>
-                        @endif
                     </div>
                 @endif
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
-                </div>
-
-                <x-action-message class="me-3" on="profile-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
+                <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>
             </div>
         </form>
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Subcategoria;
 use App\Exports\SubcategoriasExport;
 use App\Imports\SubcategoriasImport as SubcategoriasImportClass;
 use App\Models\Subcategoria;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -42,6 +43,8 @@ class SubcategoriaImport extends Component
 
     public function importar(): void
     {
+        abort_unless(auth()->user()->can('categorias.crear'), 403);
+
         $this->validate(['archivo' => 'required|file|mimes:xlsx,csv,xls']);
 
         $import = new SubcategoriasImportClass;
@@ -54,6 +57,7 @@ class SubcategoriaImport extends Component
             ->all();
 
         if ($this->creados > 0 || $this->actualizados > 0) {
+            Flux::toast(text: "Importación completada: {$this->creados} creados, {$this->actualizados} actualizados.", variant: 'success');
             $this->dispatch('subcategoria-guardada');
         }
 

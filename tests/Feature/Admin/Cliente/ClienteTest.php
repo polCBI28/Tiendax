@@ -4,10 +4,14 @@ use App\Livewire\Admin\Cliente\ClienteForm;
 use App\Livewire\Admin\Cliente\ClienteTable;
 use App\Models\Cliente;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->seed(RolesAndPermissionsSeeder::class);
+    $usuario = User::factory()->create();
+    $usuario->assignRole('Super Admin');
+    $this->actingAs($usuario);
 });
 
 test('la página de clientes carga correctamente', function () {

@@ -94,7 +94,7 @@ test('no se puede eliminar el rol Super Admin', function () {
 
     Livewire::test(RolTable::class)
         ->call('eliminar', $superAdminRol->id)
-        ->assertHasErrors('protegido');
+        ->assertDispatched('toast-show');
 
     expect(Role::where('name', 'Super Admin')->exists())->toBeTrue();
 });

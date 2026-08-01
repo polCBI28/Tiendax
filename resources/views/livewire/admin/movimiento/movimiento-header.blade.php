@@ -3,7 +3,9 @@
         <flux:heading size="xl">Movimientos de Inventario</flux:heading>
         <flux:subheading>Resumen diario de ventas y ajustes manuales de stock.</flux:subheading>
     </div>
+    @can('movimientos.crear')
     <flux:button variant="primary" icon="plus" wire:click="crear">
         Registrar Movimiento
     </flux:button>
+    @endcan
 </div>

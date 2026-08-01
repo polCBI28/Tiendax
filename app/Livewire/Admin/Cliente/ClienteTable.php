@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Cliente;
 use App\Exports\ClientesExport;
 use App\Models\Cliente;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
@@ -26,8 +27,6 @@ class ClienteTable extends Component
 
     #[Url]
     public string $dir = 'asc';
-
-    public ?string $mensaje = null;
 
     /** @var array<int, string> */
     protected array $columnasOrdenables = ['nombre', 'created_at'];
@@ -65,14 +64,18 @@ class ClienteTable extends Component
 
     public function editar(int $clienteId): void
     {
+        abort_unless(auth()->user()->can('clientes.editar'), 403);
+
         $this->dispatch('abrir-formulario-cliente', clienteId: $clienteId);
     }
 
     public function eliminar(int $clienteId): void
     {
+        abort_unless(auth()->user()->can('clientes.eliminar'), 403);
+
         Cliente::findOrFail($clienteId)->delete();
 
-        $this->mensaje = 'Cliente eliminado correctamente.';
+        Flux::toast(text: 'Cliente eliminado correctamente.', variant: 'success');
         $this->resetPage();
         $this->dispatch('cliente-eliminado');
     }
@@ -80,7 +83,7 @@ class ClienteTable extends Component
     #[On('cliente-guardado')]
     public function clienteGuardado(): void
     {
-        $this->mensaje = 'Cliente guardado correctamente.';
+        Flux::toast(text: 'Cliente guardado correctamente.', variant: 'success');
     }
 
     protected function filteredQuery(): Builder
@@ -103,12 +106,16 @@ class ClienteTable extends Component
 
     public function exportarExcel(): BinaryFileResponse
     {
+        abort_unless(auth()->user()->can('clientes.ver'), 403);
+
         return (new ClientesExport($this->filteredQuery()))
             ->download('clientes-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function exportarPdf(): StreamedResponse
     {
+        abort_unless(auth()->user()->can('clientes.ver'), 403);
+
         $clientes = $this->filteredQuery()->get();
         $pdf = Pdf::loadView('exports.clientes-pdf', ['clientes' => $clientes]);
 

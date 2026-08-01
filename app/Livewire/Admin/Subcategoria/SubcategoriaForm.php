@@ -59,6 +59,8 @@ class SubcategoriaForm extends Component
 
     public function guardar(): void
     {
+        abort_unless(auth()->user()->can($this->subcategoriaId ? 'categorias.editar' : 'categorias.crear'), 403);
+
         $validated = $this->validate();
 
         $data = [
